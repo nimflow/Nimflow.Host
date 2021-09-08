@@ -111,6 +111,8 @@ namespace Nimflow.Hub.WebApi
                 authentication.AddPolicyScheme(AuthConstants.ApiKeyOrBearer, "ApiKey or Bearer",
                     options => { options.ForwardDefaultSelector = context => { return schemeSettings.FirstOrDefault(scheme => scheme.CanHandle(context.Request.Headers))?.Scheme; }; });
             }
+            
+            services.Configure<AuthenticationSettings>(Configuration.GetSection("Authentication"));
 
             foreach (var schemaSettings in settings.GetEnabledSchemeAuthenticationSettings())
             {
@@ -207,7 +209,6 @@ namespace Nimflow.Hub.WebApi
         public void AddAuthenticationScheme(IServiceCollection services, AuthenticationBuilder authenticationBuilder, BasicAuthenticationSettings settings)
         {
             authenticationBuilder.AddBasic(_ => { });
-            services.Configure<AuthenticationSettings>(Configuration.GetSection("Authentication"));
             services.Configure<BasicAuthenticationSettings>(Configuration.GetSection("Authentication:Basic"));
             services.Configure<HttpBasicAuthProviderSettings>(Configuration.GetSection("Authentication:Basic:HttpBasicAuthProvider"));
         }
