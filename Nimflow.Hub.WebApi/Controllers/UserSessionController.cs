@@ -32,6 +32,7 @@ namespace Nimflow.Hub.WebApi.Controllers
                 Name = unit.Name,
                 Description = unit.Description,
                 OrganizationId = unit.OrganizationId,
+                OrganizationName = unit.Name,
                 Props = unit.Props ?? new Dictionary<string, string>()
             });
         }

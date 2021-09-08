@@ -361,4 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-Nimflow.Hub.WebApi/Properties/ServiceDependencies/SantanderArgentinaDevHub - Web Deploy/profile.arm.json
+Nimflow.Hub.WebApi/Properties/ServiceDependencies/

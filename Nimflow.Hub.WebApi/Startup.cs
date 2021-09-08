@@ -58,7 +58,7 @@ namespace Nimflow.Hub.WebApi
             var settings = new AuthenticationSettings();
             Configuration.Bind("Authentication", settings);
 
-            var authenticationSchemas = settings.GetEnabledSchemaAuthenticationSettings()
+            var authenticationSchemas = settings.GetEnabledSchemeAuthenticationSettings()
                 .Select(s => s.Scheme)
                 .ToArray();
             services.AddNimflowHub(
@@ -96,7 +96,7 @@ namespace Nimflow.Hub.WebApi
 
         private void AddAuthentication(IServiceCollection services, AuthenticationSettings settings)
         {
-            var schemeSettings = settings.GetEnabledSchemaAuthenticationSettings().ToArray();
+            var schemeSettings = settings.GetEnabledSchemeAuthenticationSettings().ToArray();
             if (schemeSettings.Length == 0)
                 throw new ConfigurationErrorsException("No enabled authentication schema found.");
             const string mixed = "mixed";
@@ -112,7 +112,7 @@ namespace Nimflow.Hub.WebApi
                     options => { options.ForwardDefaultSelector = context => { return schemeSettings.FirstOrDefault(scheme => scheme.CanHandle(context.Request.Headers))?.Scheme; }; });
             }
 
-            foreach (var schemaSettings in settings.GetEnabledSchemaAuthenticationSettings())
+            foreach (var schemaSettings in settings.GetEnabledSchemeAuthenticationSettings())
             {
                 AddAuthenticationScheme(services, authentication, (dynamic) schemaSettings);
             }
@@ -207,6 +207,7 @@ namespace Nimflow.Hub.WebApi
         public void AddAuthenticationScheme(IServiceCollection services, AuthenticationBuilder authenticationBuilder, BasicAuthenticationSettings settings)
         {
             authenticationBuilder.AddBasic(_ => { });
+            services.Configure<AuthenticationSettings>(Configuration.GetSection("Authentication"));
             services.Configure<BasicAuthenticationSettings>(Configuration.GetSection("Authentication:Basic"));
             services.Configure<HttpBasicAuthProviderSettings>(Configuration.GetSection("Authentication:Basic:HttpBasicAuthProvider"));
         }
