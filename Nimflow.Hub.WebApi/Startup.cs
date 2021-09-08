@@ -10,7 +10,6 @@ using Auth0.AuthenticationApi;
 using FluentValidation;
 using Hangfire;
 using Hellang.Middleware.ProblemDetails;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -45,8 +44,7 @@ namespace Nimflow.Hub.WebApi
                 .MinimumLevel.Information()
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("UnitId", configuration["BusinessDirectory:UnitId"])
-                .WriteTo
-                .ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
+                .WriteTo.Console()
                 .CreateLogger();
             Configuration = configuration;
         }
@@ -64,7 +62,7 @@ namespace Nimflow.Hub.WebApi
             services.AddNimflowHub(
                 Configuration,
                 functions => { functions.RegisterModule(new ImagesModule()); },
-                new[] {typeof(MergeStorageImagePages).Assembly},
+                new[] { typeof(MergeStorageImagePages).Assembly },
                 authenticationSchemas);
             var customBusinessDirectorySection = Configuration.GetSection("CustomBusinessDirectory");
             if (customBusinessDirectorySection.Exists())
@@ -76,7 +74,7 @@ namespace Nimflow.Hub.WebApi
             AddAuthentication(services, settings);
             services.AddTransient<IBasicAuthProvider, HttpBasicAuthProvider>();
 
-            if (settings.Bearer is {Enabled: true})
+            if (settings.Bearer is { Enabled: true })
                 services.AddSingleton(_ => new AuthenticationApiClient(new Uri(settings.Bearer.Authority)));
 
             services.AddCors(options =>
@@ -111,12 +109,12 @@ namespace Nimflow.Hub.WebApi
                 authentication.AddPolicyScheme(AuthConstants.ApiKeyOrBearer, "ApiKey or Bearer",
                     options => { options.ForwardDefaultSelector = context => { return schemeSettings.FirstOrDefault(scheme => scheme.CanHandle(context.Request.Headers))?.Scheme; }; });
             }
-            
+
             services.Configure<AuthenticationSettings>(Configuration.GetSection("Authentication"));
 
             foreach (var schemaSettings in settings.GetEnabledSchemeAuthenticationSettings())
             {
-                AddAuthenticationScheme(services, authentication, (dynamic) schemaSettings);
+                AddAuthenticationScheme(services, authentication, (dynamic)schemaSettings);
             }
         }
 
@@ -131,7 +129,7 @@ namespace Nimflow.Hub.WebApi
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory, IWebHostEnvironment env)
         {
             app.UseNimflowHub();
             app.UseProblemDetails();
@@ -149,6 +147,7 @@ namespace Nimflow.Hub.WebApi
             });
             app.UseOpenApi();
             app.UseSwaggerUi3();
+            Log.Logger.Information($"Starting with environment {env.EnvironmentName}");
         }
 
         private static void ConfigureProblemDetails(ProblemDetailsOptions options)
@@ -180,11 +179,11 @@ namespace Nimflow.Hub.WebApi
                 };
                 if (ex.Errors == null)
                     return details;
-                foreach (var error in ex.Errors) details.Errors[error.PropertyName] = new[] {error.ErrorMessage};
+                foreach (var error in ex.Errors) details.Errors[error.PropertyName] = new[] { error.ErrorMessage };
                 return details;
             });
             options.Map<ArgumentException>(ex => new StatusCodeProblemDetails(StatusCodes.Status400BadRequest)
-                {Detail = ex.Message});
+                { Detail = ex.Message });
             options.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
             options.MapToStatusCode<UnauthorizedAccessException>(StatusCodes.Status403Forbidden);
             options.MapToStatusCode<HttpRequestException>(StatusCodes.Status503ServiceUnavailable);
@@ -232,7 +231,7 @@ namespace Nimflow.Hub.WebApi
                         {
                             if (context.SecurityToken is not JwtSecurityToken token)
                                 return Task.CompletedTask;
-                            if (context.Principal is {Identity: ClaimsIdentity identity})
+                            if (context.Principal is { Identity: ClaimsIdentity identity })
                                 identity.AddClaim(new Claim("access_token", token.RawData));
 
                             return Task.CompletedTask;
