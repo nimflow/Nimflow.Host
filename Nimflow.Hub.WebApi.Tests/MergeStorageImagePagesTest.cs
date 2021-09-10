@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -16,14 +17,13 @@ namespace Nimflow.Hub.WebApi.Tests
 {
     public class MergeStorageImagePagesTest : IClassFixture<ServerFixture>
     {
+        private const string MultiPageTifUrl = "Images/sample-multipage.tif";
         private readonly ServerFixture _fixture;
 
         public MergeStorageImagePagesTest(ServerFixture fixture)
         {
             _fixture = fixture;
         }
-
-        private const string MultiPageTifUrl = "Images/sample-multipage.tif";
 
         [Fact]
         public async Task MergeStorageImagePagesShouldRunUsingMediator()
@@ -41,9 +41,8 @@ namespace Nimflow.Hub.WebApi.Tests
             Assert.NotNull(mergedFile);
             Assert.NotEqual(0, mergedFile.Length);
             Assert.True(await new ImageValidator(".tiff").IsValidAsync(mergedFile, targetPath));
-            //TODO: Needs revision
-            //var image = Image.FromStream(mergedFile);
-            //Assert.Equal(image.FrameDimensionsList.Length, command.Pages.Length);
+            var frameCount = Image.FromStream(mergedFile).GetFrameCount(System.Drawing.Imaging.FrameDimension.Page);
+            Assert.Equal(frameCount, command.Pages.Length);
         }
 
         [Fact]
@@ -99,11 +98,12 @@ namespace Nimflow.Hub.WebApi.Tests
                 urls.Add(path);
                 added++;
             }
+
             Assert.Contains(urls, url => url == MultiPageTifUrl);
             var list = await blobStorage.List(images, null, CancellationToken.None);
             Assert.NotNull(list);
             Assert.Equal(added, list.Count);
-            if (added <= 0) 
+            if (added <= 0)
                 return urls;
             await using var stream = await blobStorage.OpenRead(urls.First(), CancellationToken.None);
             Assert.NotEqual(0, stream.Length);
