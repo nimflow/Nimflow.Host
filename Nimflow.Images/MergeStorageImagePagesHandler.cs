@@ -74,6 +74,8 @@ namespace Nimflow.Images
                 try
                 {
                     await using var stream = await _blobStorageService.OpenRead(fileUrl, cancellationToken);
+                    if (stream == null)
+                        throw new ApplicationException($"Image at {fileUrl} not found.");
                     var pageIndices = request.Pages.Where(s => s.FileIndex == fileIndex).Select(s => s.FilePageNumber);
                     var pages = GetPages(stream, pageIndices, imageFormat);
                     result[fileIndex] = pages;
@@ -89,6 +91,7 @@ namespace Nimflow.Images
 
         private static IDictionary<int, Image> GetPages(Stream stream, IEnumerable<int> pageNumbers, ImageFormat imageFormat)
         {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
             var images = new Dictionary<int, Image>();
             var bitmap = (Bitmap)Image.FromStream(stream);
             var count = bitmap.GetFrameCount(FrameDimension.Page);
