@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -19,6 +20,7 @@ using Nimflow.Orch.Application;
 
 namespace Nimflow.Hub.WebApi.Services
 {
+    [ExcludeFromCodeCoverage]
     public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationSchemeOptions>
     {
         private readonly IBasicAuthProvider _provider;

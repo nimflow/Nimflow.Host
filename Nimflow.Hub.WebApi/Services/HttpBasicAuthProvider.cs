@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Nimflow.Hub.WebApi.Services
 {
+    [ExcludeFromCodeCoverage]
     public class HttpBasicAuthProvider : IBasicAuthProvider
     {
         private readonly IMemoryCache _cache;
@@ -68,7 +70,7 @@ namespace Nimflow.Hub.WebApi.Services
             }
 
             var credentialBytes = Convert.FromBase64String(credential);
-            var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] {':'}, 2);
+            var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
             var token = await GetTokenFromHttpService(credentials[0], credentials[1], ct);
             if (token == null)
                 return null;

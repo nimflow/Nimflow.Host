@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 
 namespace Nimflow.Hub.WebApi.Settings
 {
+    [ExcludeFromCodeCoverage]
     public abstract class SchemeAuthenticationSettings
     {
         public abstract string Scheme { get; }

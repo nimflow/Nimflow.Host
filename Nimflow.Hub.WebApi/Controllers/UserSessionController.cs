@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Nimflow.Hub.WebApi.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
+    [ExcludeFromCodeCoverage]
     public class UserSessionController : ControllerBase
     {
         private readonly IUnitsService _unitsService;

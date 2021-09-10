@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using Nimflow.Hub.WebApi.Services;
 
 namespace Nimflow.Hub.WebApi.Settings
 {
+    [ExcludeFromCodeCoverage]
     public class BasicAuthenticationSettings : SchemeAuthenticationSettings
     {
         //public HttpBasicAuthProviderSettings HttpBasicAuthProvider { get; set; }

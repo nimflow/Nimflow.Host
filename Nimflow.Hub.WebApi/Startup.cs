@@ -1,5 +1,6 @@
 using System;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
@@ -12,6 +13,7 @@ using Hangfire;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -150,6 +152,7 @@ namespace Nimflow.Hub.WebApi
             Log.Logger.Information($"Starting with environment {env.EnvironmentName}");
         }
 
+        [ExcludeFromCodeCoverage]
         private static void ConfigureProblemDetails(ProblemDetailsOptions options)
         {
             options.IncludeExceptionDetails = (ctx, ex) =>
@@ -205,6 +208,7 @@ namespace Nimflow.Hub.WebApi
             });
         }
 
+        [ExcludeFromCodeCoverage]
         public void AddAuthenticationScheme(IServiceCollection services, AuthenticationBuilder authenticationBuilder, BasicAuthenticationSettings settings)
         {
             authenticationBuilder.AddBasic(_ => { });
@@ -219,43 +223,49 @@ namespace Nimflow.Hub.WebApi
 
         public void AddAuthenticationScheme(IServiceCollection services, AuthenticationBuilder authenticationBuilder, BearerAuthenticationSettings settings)
         {
-            authenticationBuilder.AddJwtBearer(
-                options =>
-                {
-                    options.Authority = settings.Authority;
-                    options.Audience = settings.Audience;
-                    options.SaveToken = true;
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnTokenValidated = context =>
-                        {
-                            if (context.SecurityToken is not JwtSecurityToken token)
-                                return Task.CompletedTask;
-                            if (context.Principal is { Identity: ClaimsIdentity identity })
-                                identity.AddClaim(new Claim("access_token", token.RawData));
-
-                            return Task.CompletedTask;
-                        }
-                    };
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-                    };
-                });
+            authenticationBuilder.AddJwtBearer(options => ConfigureJwtBearerScheme(settings, options));
         }
 
+        [ExcludeFromCodeCoverage]
+        private static void ConfigureJwtBearerScheme(BearerAuthenticationSettings settings, JwtBearerOptions options)
+        {
+            options.Authority = settings.Authority;
+            options.Audience = settings.Audience;
+            options.SaveToken = true;
+            options.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = context =>
+                {
+                    if (context.SecurityToken is not JwtSecurityToken token)
+                        return Task.CompletedTask;
+                    if (context.Principal is { Identity: ClaimsIdentity identity })
+                        identity.AddClaim(new Claim("access_token", token.RawData));
+
+                    return Task.CompletedTask;
+                }
+            };
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+            };
+        }
+
+        [ExcludeFromCodeCoverage]
         public void AddAuthenticationScheme(IServiceCollection services, AuthenticationBuilder authenticationBuilder, NegotiateAuthenticationSettings settings)
         {
-            authenticationBuilder.AddNegotiate(options =>
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    options.EnableLdap(ldapSettings =>
-                    {
-                        ldapSettings.Domain = settings.LdapDomain;
-                        ldapSettings.MachineAccountName = settings.MachineAccountName;
-                        ldapSettings.MachineAccountPassword = settings.MachineAccountPassword;
-                    });
-            });
+            authenticationBuilder.AddNegotiate(options => { ConfigureNegotiateScheme(settings, options); });
+        }
+
+        [ExcludeFromCodeCoverage]
+        private static void ConfigureNegotiateScheme(NegotiateAuthenticationSettings settings, NegotiateOptions options)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                options.EnableLdap(ldapSettings =>
+                {
+                    ldapSettings.Domain = settings.LdapDomain;
+                    ldapSettings.MachineAccountName = settings.MachineAccountName;
+                    ldapSettings.MachineAccountPassword = settings.MachineAccountPassword;
+                });
         }
     }
 }

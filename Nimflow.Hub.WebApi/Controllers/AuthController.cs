@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ namespace Nimflow.Hub.WebApi.Controllers
     [ApiController]
     [Route("[controller]")]
     [AllowAnonymous]
+    [ExcludeFromCodeCoverage]
     public class AuthController : ControllerBase
     {
         private readonly IOptionsSnapshot<AuthenticationSettings> _authenticationOptionsSnapshot;

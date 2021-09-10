@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Nimflow.Hub.WebApi.Services
 {
+    [ExcludeFromCodeCoverage]
     public class HttpBasicAuthProviderSettings
     {
         public string AuthorizeUrl { get; set; }

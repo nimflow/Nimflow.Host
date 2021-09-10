@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Nimflow.Hub.WebApi.Controllers
 {
+    [ExcludeFromCodeCoverage]
     public class UnitInfo
     {
         [Required] public string Id { get; set; }
