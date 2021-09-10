@@ -2,11 +2,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Nimflow.BlobStorage;
 using Nimflow.Functions;
@@ -15,21 +13,20 @@ using Xunit;
 
 namespace Nimflow.Hub.WebApi.Tests
 {
-    public class MergeStorageImagePagesTest : IClassFixture<ServerFixture>
+    public class MergeStorageImagePagesTest : ServerFixtureTest
     {
         private const string MultiPageTifUrl = "Images/sample-multipage.tif";
-        private readonly ServerFixture _fixture;
 
-        public MergeStorageImagePagesTest(ServerFixture fixture)
+        public MergeStorageImagePagesTest(ServerFixture fixture): base(fixture)
         {
-            _fixture = fixture;
         }
 
         [Fact]
         public async Task MergeStorageImagePagesShouldRunUsingMediator()
         {
+            RunAsAutomation();
             await AddTestFiles();
-            var mediator = _fixture.Server.Services.GetRequiredService<IMediator>();
+            var mediator = GetRequiredService<IMediator>();
             const string targetPath = "Outbox/NewByMediatorImage.tiff";
             var command = BuildMergePagesCommand(targetPath);
             var result = await mediator.Send(command, CancellationToken.None);
@@ -48,14 +45,15 @@ namespace Nimflow.Hub.WebApi.Tests
         [Fact]
         public async Task MergeStorageImagePagesShouldRunUsingFunctions()
         {
+            RunAsAutomation();
             await AddTestFiles();
-            var functionsDomain = _fixture.Server.Services.GetRequiredService<IFunctionsDomain>();
+            var functionsDomain = GetRequiredService<IFunctionsDomain>();
             var imagesModule = functionsDomain.FindByName(new ImagesModule().Name);
             Assert.NotNull(imagesModule);
             const string targetPath = "Outbox/NewByMediatorImage.tif";
             var command = BuildMergePagesCommand(targetPath);
             var arguments = JsonConvert.DeserializeObject<IDictionary<string, object>>(JsonConvert.SerializeObject(command));
-            await imagesModule.Call(_fixture.Server.Services, nameof(MergeStorageImagePages), arguments, CancellationToken.None);
+            await imagesModule.Call(Fixture.Server.Services, nameof(MergeStorageImagePages), arguments, CancellationToken.None);
         }
 
         private static MergeStorageImagePages BuildMergePagesCommand(string targetPath)
@@ -87,7 +85,7 @@ namespace Nimflow.Hub.WebApi.Tests
         private async Task<IReadOnlyCollection<string>> AddTestFiles()
         {
             var urls = new List<string>();
-            var blobStorage = _fixture.Server.Services.GetRequiredService<IBlobStorageService>();
+            var blobStorage = GetRequiredService<IBlobStorageService>();
             const string images = "Images";
             var added = 0;
             foreach (var filePath in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), images)))
