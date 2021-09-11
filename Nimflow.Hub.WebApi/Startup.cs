@@ -91,6 +91,12 @@ namespace Nimflow.Hub.WebApi
             });
             services.AddApplicationInsightsTelemetry();
             services.AddProblemDetails(ConfigureProblemDetails);
+            services.Configure<HostOptions>(options =>
+            {
+                options.ShutdownTimeout = TimeSpan.FromSeconds(60);
+            });
+            services.AddSingleton<ShuttingDownHealthCheck>();
+            services.AddHealthChecks().AddCheck<ShuttingDownHealthCheck>("ShuttingDown");
             AddApiDocument(services);
         }
 
@@ -146,6 +152,7 @@ namespace Nimflow.Hub.WebApi
             {
                 endpoints.MapControllers();
                 endpoints.MapHangfireDashboard();
+                endpoints.MapHealthChecks("/health");
             });
             app.UseOpenApi();
             app.UseSwaggerUi3();
