@@ -129,7 +129,7 @@ namespace Nimflow.Hub.WebApi
         private static void OverrideNimflowStandardServices(IServiceCollection services, CustomBusinessDirectorySettings settings)
         {
             services.AddScoped<IUsersManager, UsersManager>();
-            services.AddScoped<IBusinessDirectoryAccessControlService, Services.BusinessDirectoryAccessControlService>();
+            services.AddScoped<IBusinessDirectoryAccessControlService, FromIdentityBusinessDirectoryAccessControlService>();
             services.AddSingleton<IUnitsService>(_ => new UnitsService(settings));
             services.AddSingleton<IUsersService>(_ => new UsersService());
             services.AddSingleton<IOrganizationsService>(_ => new OrganizationsService(settings));

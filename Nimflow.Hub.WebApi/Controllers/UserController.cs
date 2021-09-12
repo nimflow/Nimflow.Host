@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nimflow.Hub.AspNet.Auth;
 using Nimflow.Hub.WebApi.Services;
 using Nimflow.Hub.WebApi.Settings;
 
@@ -21,12 +22,14 @@ namespace Nimflow.Hub.WebApi.Controllers
         private readonly IBasicAuthProvider _basicAuthProvider;
         private readonly ILogger<UserController> _logger;
         private readonly IOptionsSnapshot<BasicAuthenticationSettings> _basicAuthenticationOptionsSnapshot;
+        private readonly IBusinessDirectoryAccessControlService _bdAccessControlService;
 
-        public UserController(IBasicAuthProvider basicAuthProvider, ILogger<UserController> logger, IOptionsSnapshot<BasicAuthenticationSettings> basicAuthenticationOptionsSnapshot)
+        public UserController(IBasicAuthProvider basicAuthProvider, ILogger<UserController> logger, IOptionsSnapshot<BasicAuthenticationSettings> basicAuthenticationOptionsSnapshot, IBusinessDirectoryAccessControlService bdAccessControlService)
         {
             _basicAuthProvider = basicAuthProvider;
             _logger = logger;
             _basicAuthenticationOptionsSnapshot = basicAuthenticationOptionsSnapshot;
+            _bdAccessControlService = bdAccessControlService;
         }
 
         [HttpPost("[action]")]

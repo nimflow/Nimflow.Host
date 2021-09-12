@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -15,15 +14,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nimflow.Hub.AspNet.Auth;
 using Nimflow.Hub.WebApi.Settings;
-using Nimflow.Orch.Application;
 
 namespace Nimflow.Hub.WebApi.Services
 {
     [ExcludeFromCodeCoverage]
     public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationSchemeOptions>
     {
-        private readonly IBasicAuthProvider _provider;
         private readonly IOptionsSnapshot<BasicAuthenticationSettings> _optionsSnapshot;
+        private readonly IBasicAuthProvider _provider;
 
         public BasicAuthenticationHandler(
             IBasicAuthProvider provider,
@@ -79,13 +77,6 @@ namespace Nimflow.Hub.WebApi.Services
             if (grantedActions.Count > 0)
                 result.Add(new Claim(AuthConstants.GrantActionsType, string.Join(';', grantedActions)));
             return result;
-        }
-
-        private static IReadOnlyCollection<string> GetGrantedAction(IReadOnlyCollection<string> roleNames)
-        {
-            return roleNames != null 
-                ? roleNames.SelectMany(RoleActions.GetActionsByRole).Distinct().ToArray()
-                : Array.Empty<string>();
         }
     }
 }
