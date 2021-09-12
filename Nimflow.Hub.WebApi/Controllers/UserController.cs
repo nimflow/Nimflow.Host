@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Nimflow.Hub.WebApi.Services;
+using Nimflow.Hub.WebApi.Settings;
 
 namespace Nimflow.Hub.WebApi.Controllers
 {
@@ -17,11 +20,13 @@ namespace Nimflow.Hub.WebApi.Controllers
     {
         private readonly IBasicAuthProvider _basicAuthProvider;
         private readonly ILogger<UserController> _logger;
+        private readonly IOptionsSnapshot<BasicAuthenticationSettings> _basicAuthenticationOptionsSnapshot;
 
-        public UserController(IBasicAuthProvider basicAuthProvider, ILogger<UserController> logger)
+        public UserController(IBasicAuthProvider basicAuthProvider, ILogger<UserController> logger, IOptionsSnapshot<BasicAuthenticationSettings> basicAuthenticationOptionsSnapshot)
         {
             _basicAuthProvider = basicAuthProvider;
             _logger = logger;
+            _basicAuthenticationOptionsSnapshot = basicAuthenticationOptionsSnapshot;
         }
 
         [HttpPost("[action]")]
@@ -44,12 +49,13 @@ namespace Nimflow.Hub.WebApi.Controllers
             throw new UnauthorizedAccessException();
         }
 
-        private static UserInfo CreateUserInfo(JwtSecurityToken securityToken, string username)
+        private UserInfo CreateUserInfo(JwtSecurityToken securityToken, string username)
         {
             return new UserInfo
             {
                 Name = username,
-                Email = securityToken.Claims.FirstOrDefault(s => s.Type.ToLowerInvariant() == "email")?.Value
+                Email = securityToken.Claims.FirstOrDefault(s => s.Type.ToLowerInvariant() == "email")?.Value,
+                GrantActions = securityToken.GetGrantedActions(_basicAuthenticationOptionsSnapshot.Value)?.ToArray() ?? Array.Empty<string>()
             };
         }
 
@@ -59,6 +65,8 @@ namespace Nimflow.Hub.WebApi.Controllers
             public string Name { get; set; }
 
             public string Email { get; set; }
+
+            public string[] GrantActions { get; set; }
             // ReSharper restore UnusedAutoPropertyAccessor.Global
         }
     }

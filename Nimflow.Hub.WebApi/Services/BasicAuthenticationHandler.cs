@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Nimflow.Hub.AspNet.Auth;
 using Nimflow.Hub.WebApi.Settings;
 using Nimflow.Orch.Application;
@@ -76,7 +75,7 @@ namespace Nimflow.Hub.WebApi.Services
             if (settings.ClaimRoleMappings == null)
                 return jwtToken.Claims;
             var result = new List<Claim>(jwtToken.Claims);
-            var grantedActions = GetGrantedAction(GetRoleNames(jwtToken, settings));
+            var grantedActions = jwtToken.GetGrantedActions(settings);
             if (grantedActions.Count > 0)
                 result.Add(new Claim(AuthConstants.GrantActionsType, string.Join(';', grantedActions)));
             return result;
@@ -87,29 +86,6 @@ namespace Nimflow.Hub.WebApi.Services
             return roleNames != null 
                 ? roleNames.SelectMany(RoleActions.GetActionsByRole).Distinct().ToArray()
                 : Array.Empty<string>();
-        }
-
-        private static IReadOnlyCollection<string> GetRoleNames(JwtSecurityToken jwtToken, BasicAuthenticationSettings settings)
-        {
-            if (settings?.ClaimRoleMappings == null || settings.ClaimRoleMappings.Length == 0)
-                return Array.Empty<string>();
-            var result = new List<string>();
-            foreach (var claimRoleMapping in settings.ClaimRoleMappings.Where(s => s.ClaimType != null && s.ValuePropertyName != null && s.Roles != null))
-            {
-                result.AddRange(jwtToken.Claims.SelectMany(claim =>
-                {
-                    if (claim.Type != claimRoleMapping.ClaimType)
-                        return Array.Empty<string>();
-                    var claimData = JsonConvert.DeserializeObject<IDictionary<string, object>>(claim.Value);
-                    if (claimData == null || !claimData.ContainsKey(claimRoleMapping.ValuePropertyName))
-                        return Array.Empty<string>();
-                    if (claimData[claimRoleMapping.ValuePropertyName] is string claimValue && claimRoleMapping.Roles.ContainsKey(claimValue))
-                        return new[] { claimRoleMapping.Roles[claimValue] as string };
-                    return Array.Empty<string>();
-                }).ToArray());
-            }
-
-            return result;
         }
     }
 }
