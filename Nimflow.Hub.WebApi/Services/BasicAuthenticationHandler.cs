@@ -8,8 +8,6 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nimflow.Hub.AspNet.Auth;
@@ -38,12 +36,8 @@ namespace Nimflow.Hub.WebApi.Services
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            var endpoint = Context.GetEndpoint();
-            if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
-                return AuthenticateResult.NoResult();
-
             if (!Request.Headers.ContainsKey("Authorization"))
-                return AuthenticateResult.Fail("Missing Authorization Header");
+                return AuthenticateResult.NoResult();
             var settings = _optionsSnapshot.Value;
             try
             {

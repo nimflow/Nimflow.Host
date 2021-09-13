@@ -9,15 +9,7 @@
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "Nimflow.Hub.SelfHosted.WebApi": {
+    "Nimflow.Hub.WebApi": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -27,18 +19,26 @@
       "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:44304"
     },
-    "Docker": {
-      "commandName": "Docker",
+    "IIS Express": {
+      "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_URLS": "https://+:44304",
-        "ASPNETCORE_HTTPS_PORT": "44304",
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "publishAllPorts": true,
-      "useSSL": true,
-      "sslPort": 44304
-    }
+      }
+    }//,
+    //"Docker": {
+    //  "commandName": "Docker",
+    //  "launchBrowser": true,
+    //  "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+    //  "environmentVariables": {
+    //    "ASPNETCORE_URLS": "https://+:44304",
+    //    "ASPNETCORE_HTTPS_PORT": "44304",
+    //    "ASPNETCORE_ENVIRONMENT": "Development"
+    //  },
+    //  "publishAllPorts": true,
+    //  "useSSL": true,
+    //  "sslPort": 44304
+    //}
   }
 }
