@@ -27,16 +27,16 @@ namespace Nimflow.Hub.WebApi.Tests
             return request.PostAsync();
         }
 
-        [Fact]
-        public async Task UserAuthenticateResponseMustBeNull()
-        {
-            var response = await PostAsJson("/user/authenticate", new AuthenticationRequest
-            {
-                Username = "string",
-                Password = "string"
-            });
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        }
+        //[Fact]
+        //public async Task UserAuthenticateResponseMustBeNull()
+        //{
+        //    var response = await PostAsJson("/user/authenticate", new AuthenticationRequest
+        //    {
+        //        Username = "string",
+        //        Password = "string"
+        //    });
+        //    Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        //}
 
         [Fact]
         public async Task UserSessionGetUnitsShouldBeUnauthorized()

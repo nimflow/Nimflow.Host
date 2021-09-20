@@ -63,7 +63,7 @@ namespace Nimflow.Hub.WebApi
                 .ToArray();
             services.AddNimflowHub(
                 Configuration,
-                functions => { functions.RegisterModule(new ImagesModule()); },
+                _ => { },
                 new[] { typeof(MergeStorageImagePages).Assembly },
                 authenticationSchemas);
             var customBusinessDirectorySection = Configuration.GetSection("CustomBusinessDirectory");

@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimflow.Hub.WebApi", "Nimflow.Hub.WebApi\Nimflow.Hub.WebApi.csproj", "{FE617515-5953-409F-B9FC-4C3B9A8FC026}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimflow.Images", "Nimflow.Images\Nimflow.Images.csproj", "{FB1F2B39-3F26-44DA-A5CF-23939E84CF30}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimflow.Hub.WebApi.Tests", "Nimflow.Hub.WebApi.Tests\Nimflow.Hub.WebApi.Tests.csproj", "{14FDC466-18F1-48BD-A863-24CC7D6A140C}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{FE617515-5953-409F-B9FC-4C3B9A8FC026}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE617515-5953-409F-B9FC-4C3B9A8FC026}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE617515-5953-409F-B9FC-4C3B9A8FC026}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FB1F2B39-3F26-44DA-A5CF-23939E84CF30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB1F2B39-3F26-44DA-A5CF-23939E84CF30}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB1F2B39-3F26-44DA-A5CF-23939E84CF30}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FB1F2B39-3F26-44DA-A5CF-23939E84CF30}.Release|Any CPU.Build.0 = Release|Any CPU
 		{14FDC466-18F1-48BD-A863-24CC7D6A140C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{14FDC466-18F1-48BD-A863-24CC7D6A140C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14FDC466-18F1-48BD-A863-24CC7D6A140C}.Release|Any CPU.ActiveCfg = Release|Any CPU

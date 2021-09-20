@@ -8,7 +8,6 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["Nimflow.Hub.WebApi/Nimflow.Hub.WebApi.csproj", "Nimflow.Hub.WebApi/"]
-COPY ["Nimflow.Images/Nimflow.Images.csproj", "Nimflow.Images/"]
 RUN dotnet restore "Nimflow.Hub.WebApi/Nimflow.Hub.WebApi.csproj"
 COPY . .
 WORKDIR "/src/Nimflow.Hub.WebApi"
