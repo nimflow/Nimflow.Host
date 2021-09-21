@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Nimflow.Hub.WebApi.Services
@@ -17,17 +18,27 @@ namespace Nimflow.Hub.WebApi.Services
     public class HttpBasicAuthProvider : IBasicAuthProvider
     {
         private readonly IMemoryCache _cache;
+        private readonly ILogger<HttpBasicAuthProvider> _logger;
         private readonly IOptionsSnapshot<HttpBasicAuthProviderSettings> _optionsSnapshot;
 
-        public HttpBasicAuthProvider(IOptionsSnapshot<HttpBasicAuthProviderSettings> optionsSnapshot, IMemoryCache cache)
+        public HttpBasicAuthProvider(IOptionsSnapshot<HttpBasicAuthProviderSettings> optionsSnapshot, IMemoryCache cache, ILogger<HttpBasicAuthProvider> logger)
         {
             _optionsSnapshot = optionsSnapshot;
             _cache = cache;
+            _logger = logger;
         }
 
-        public Task<JwtSecurityToken> Authenticate(string credential, CancellationToken ct)
+        public async Task<JwtSecurityToken> Authenticate(string credential, CancellationToken ct)
         {
-            return GetToken(credential, ct);
+            try
+            {
+                return await GetToken(credential, ct);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error getting token from value: {credential}. Error: {e.Message}.");
+                throw;
+            }
         }
 
         private object BuildBody(string username, string password, HttpBasicAuthProviderSettings settings)
