@@ -145,7 +145,7 @@ namespace Nimflow.Hub.WebApi
             app.UseHsts();
             app.UseHttpsRedirection();
 
-            app.UseDefaultFiles();
+            //app.UseDefaultFiles();
 
             app.UseStaticFiles();
             if (env?.WebRootPath != null)
