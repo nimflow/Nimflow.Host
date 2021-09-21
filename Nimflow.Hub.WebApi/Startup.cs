@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
@@ -20,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -91,10 +93,7 @@ namespace Nimflow.Hub.WebApi
             });
             services.AddApplicationInsightsTelemetry();
             services.AddProblemDetails(ConfigureProblemDetails);
-            services.Configure<HostOptions>(options =>
-            {
-                options.ShutdownTimeout = TimeSpan.FromSeconds(60);
-            });
+            services.Configure<HostOptions>(options => { options.ShutdownTimeout = TimeSpan.FromSeconds(60); });
             services.AddSingleton<ShuttingDownHealthCheck>();
             services.AddHealthChecks().AddCheck<ShuttingDownHealthCheck>("ShuttingDown");
             AddApiDocument(services);
@@ -145,6 +144,14 @@ namespace Nimflow.Hub.WebApi
             loggerFactory.AddSerilog();
             app.UseHsts();
             app.UseHttpsRedirection();
+
+            app.UseDefaultFiles();
+
+            app.UseStaticFiles();
+            UseSpaFileServer(app, env, "portal");
+            UseSpaFileServer(app, env, "studio");
+
+
             app.UseRouting();
             app.UseCors(AllowAnyOrigin);
             app.UseAuthorization();
@@ -157,6 +164,18 @@ namespace Nimflow.Hub.WebApi
             app.UseOpenApi();
             app.UseSwaggerUi3();
             Log.Logger.Information($"Starting with environment {env.EnvironmentName}");
+        }
+
+        private static void UseSpaFileServer(IApplicationBuilder app, IWebHostEnvironment env, string name)
+        {
+            var portalFsOptions = new FileServerOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, name)),
+                RequestPath = $"/{name}"
+            };
+            portalFsOptions.DefaultFilesOptions.DefaultFileNames.Clear();
+            portalFsOptions.DefaultFilesOptions.DefaultFileNames.Add("index.html");
+            app.UseFileServer(portalFsOptions);
         }
 
         [ExcludeFromCodeCoverage]
