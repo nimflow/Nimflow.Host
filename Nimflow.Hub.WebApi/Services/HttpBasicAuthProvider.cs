@@ -85,8 +85,8 @@ namespace Nimflow.Hub.WebApi.Services
             var token = await GetTokenFromHttpService(credentials[0], credentials[1], ct);
             if (token == null)
                 return null;
-            var handler = new JwtSecurityTokenHandler();
-            jwtToken = handler.ReadJwtToken(token);
+
+            jwtToken = new JwtSecurityToken(token);
             var absoluteExpiration = DateTimeOffset.Now.AddHours(1);
             _cache.Set(
                 credential,

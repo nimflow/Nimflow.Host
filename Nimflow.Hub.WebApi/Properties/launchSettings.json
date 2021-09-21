@@ -26,19 +26,13 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    }//,
-    //"Docker": {
-    //  "commandName": "Docker",
-    //  "launchBrowser": true,
-    //  "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-    //  "environmentVariables": {
-    //    "ASPNETCORE_URLS": "https://+:44304",
-    //    "ASPNETCORE_HTTPS_PORT": "44304",
-    //    "ASPNETCORE_ENVIRONMENT": "Development"
-    //  },
-    //  "publishAllPorts": true,
-    //  "useSSL": true,
-    //  "sslPort": 44304
-    //}
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "publishAllPorts": true,
+      "useSSL": true
+    }
   }
 }
