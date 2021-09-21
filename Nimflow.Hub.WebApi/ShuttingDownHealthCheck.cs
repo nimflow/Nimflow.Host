@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Nimflow.Hub.WebApi
 {
+    [ExcludeFromCodeCoverage]
     public class ShuttingDownHealthCheck : IHealthCheck
     {
         private HealthStatus _status = HealthStatus.Healthy;
@@ -17,7 +19,7 @@ namespace Nimflow.Hub.WebApi
             {
                 _status = HealthStatus.Unhealthy;
                 var delayShutdown = hostEnvironment.IsProduction();
-                if (!delayShutdown) 
+                if (!delayShutdown)
                     return;
                 var delay = TimeSpan.FromSeconds(40);
                 logger.LogInformation($"Delaying shutdown for {delay.TotalSeconds} seconds.");

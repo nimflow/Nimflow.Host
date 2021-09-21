@@ -148,9 +148,11 @@ namespace Nimflow.Hub.WebApi
             app.UseDefaultFiles();
 
             app.UseStaticFiles();
-            UseSpaFileServer(app, env, "portal");
-            UseSpaFileServer(app, env, "studio");
-
+            if (env?.WebRootPath != null)
+            {
+                UseSpaFileServer(app, env, "portal");
+                UseSpaFileServer(app, env, "studio");
+            }
 
             app.UseRouting();
             app.UseCors(AllowAnyOrigin);
@@ -163,14 +165,15 @@ namespace Nimflow.Hub.WebApi
             });
             app.UseOpenApi();
             app.UseSwaggerUi3();
-            Log.Logger.Information($"Starting with environment {env.EnvironmentName}");
+            Log.Logger.Information($"Starting with environment {env?.EnvironmentName}");
         }
 
+        [ExcludeFromCodeCoverage]
         private static void UseSpaFileServer(IApplicationBuilder app, IWebHostEnvironment env, string name)
         {
             var portalFsOptions = new FileServerOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, name)),
+                FileProvider = new PhysicalFileProvider(env?.WebRootPath != null ? Path.Combine(env.WebRootPath, name) : name),
                 RequestPath = $"/{name}"
             };
             portalFsOptions.DefaultFilesOptions.DefaultFileNames.Clear();

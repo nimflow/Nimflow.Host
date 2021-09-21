@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Newtonsoft.Json;
@@ -8,6 +9,7 @@ using Nimflow.Orch.Application;
 
 namespace Nimflow.Hub.WebApi.Services
 {
+    [ExcludeFromCodeCoverage]
     public static class JwtSecurityTokenExtensions
     {
         public static IReadOnlyCollection<string> GetGrantedActions(this JwtSecurityToken jwtToken, BasicAuthenticationSettings settings)
@@ -15,7 +17,7 @@ namespace Nimflow.Hub.WebApi.Services
             if (settings == null)
                 return Array.Empty<string>();
             var roleNames = GetRoleNames(jwtToken, settings);
-            return roleNames != null 
+            return roleNames != null
                 ? roleNames.SelectMany(RoleActions.GetActionsByRole).Distinct().ToArray()
                 : Array.Empty<string>();
         }

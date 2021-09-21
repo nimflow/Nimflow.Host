@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
@@ -17,14 +17,16 @@ namespace Nimflow.Hub.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ExcludeFromCodeCoverage]
     public class UserController : ControllerBase
     {
-        private readonly IBasicAuthProvider _basicAuthProvider;
-        private readonly ILogger<UserController> _logger;
         private readonly IOptionsSnapshot<BasicAuthenticationSettings> _basicAuthenticationOptionsSnapshot;
+        private readonly IBasicAuthProvider _basicAuthProvider;
         private readonly IBusinessDirectoryAccessControlService _bdAccessControlService;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IBasicAuthProvider basicAuthProvider, ILogger<UserController> logger, IOptionsSnapshot<BasicAuthenticationSettings> basicAuthenticationOptionsSnapshot, IBusinessDirectoryAccessControlService bdAccessControlService)
+        public UserController(IBasicAuthProvider basicAuthProvider, ILogger<UserController> logger, IOptionsSnapshot<BasicAuthenticationSettings> basicAuthenticationOptionsSnapshot,
+            IBusinessDirectoryAccessControlService bdAccessControlService)
         {
             _basicAuthProvider = basicAuthProvider;
             _logger = logger;
