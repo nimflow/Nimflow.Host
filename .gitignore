@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 Nimflow.Hub.WebApi/Properties/ServiceDependencies/
 /Nimflow.Hub.WebApi/appsettings.Production.json
+
+Nimflow.Hub.WebApi/wwwroot/**/*.map
