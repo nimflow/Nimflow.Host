@@ -12,7 +12,7 @@
     "Nimflow.Hub.WebApi": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "swagger",
+      "launchUrl": "studio",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
@@ -150,8 +151,14 @@ namespace Nimflow.Hub.WebApi
             app.UseStaticFiles();
             if (env?.WebRootPath != null)
             {
-                UseSpaFileServer(app, env, "portal");
-                UseSpaFileServer(app, env, "studio");
+                UseSpaFileServer(app, env, "portal", new[] { "index.html" });
+                UseSpaFileServer(app, env, "studio", new[] { "index.html" });
+                UseSpaFileServer(app, env, "unpkg", Array.Empty<string>());
+                app.UseDirectoryBrowser(new DirectoryBrowserOptions
+                {
+                    FileProvider = new PhysicalFileProvider(Path.Combine(env.WebRootPath, "unpkg")),
+                    RequestPath = "/unpkg"
+                });
             }
 
             app.UseRouting();
@@ -169,15 +176,22 @@ namespace Nimflow.Hub.WebApi
         }
 
         [ExcludeFromCodeCoverage]
-        private static void UseSpaFileServer(IApplicationBuilder app, IWebHostEnvironment env, string name)
+        private static void UseSpaFileServer(IApplicationBuilder app, IWebHostEnvironment env, string name, IEnumerable<string> defaultFileNames)
         {
             var portalFsOptions = new FileServerOptions
             {
                 FileProvider = new PhysicalFileProvider(env?.WebRootPath != null ? Path.Combine(env.WebRootPath, name) : name),
                 RequestPath = $"/{name}"
             };
-            portalFsOptions.DefaultFilesOptions.DefaultFileNames.Clear();
-            portalFsOptions.DefaultFilesOptions.DefaultFileNames.Add("index.html");
+            if (defaultFileNames != null)
+            {
+                portalFsOptions.DefaultFilesOptions.DefaultFileNames.Clear();
+                foreach (var defaultFileName in defaultFileNames)
+                {
+                    portalFsOptions.DefaultFilesOptions.DefaultFileNames.Add(defaultFileName);
+                }
+            }
+
             app.UseFileServer(portalFsOptions);
         }
 
