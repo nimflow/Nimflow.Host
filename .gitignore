@@ -365,3 +365,4 @@ Nimflow.Hub.WebApi/Properties/ServiceDependencies/
 /Nimflow.Hub.WebApi/appsettings.Production.json
 
 Nimflow.Hub.WebApi/wwwroot/**/*.map
+Nimflow.Hub.WebApi/wwwroot/studio/test-images/
