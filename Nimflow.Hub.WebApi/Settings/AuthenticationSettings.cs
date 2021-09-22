@@ -12,7 +12,7 @@ namespace Nimflow.Hub.WebApi.Settings
 
         public IEnumerable<SchemeAuthenticationSettings> GetEnabledSchemeAuthenticationSettings()
         {
-            return new SchemeAuthenticationSettings[] {Basic, ApiKey, Bearer, Negotiate}.Where(s => s is {Enabled: true});
+            return new SchemeAuthenticationSettings[] {ApiKey, Basic, Bearer, Negotiate}.Where(s => s is {Enabled: true});
         }
     }
 }
