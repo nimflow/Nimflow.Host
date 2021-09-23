@@ -438,10 +438,23 @@ function mergeStorageImagePages(parameters) {
     parameters: parameters
   });
 }
+/**
+ * Get an image from the storage and return the frame count (pages).
+ * Returns -1 when the image is not found.
+ */
+
+function getStorageImageFrameCount(parameters) {
+  return call({
+    moduleName: moduleName$6,
+    name: 'GetStorageImageFrameCount',
+    parameters: parameters
+  });
+}
 
 var images = {
   __proto__: null,
-  mergeStorageImagePages: mergeStorageImagePages
+  mergeStorageImagePages: mergeStorageImagePages,
+  getStorageImageFrameCount: getStorageImageFrameCount
 };
 
 exports.blobStorage = blobStorage;
