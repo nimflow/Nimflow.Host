@@ -164,7 +164,7 @@
     "RecognizedDocumentAction": {
         "saveAsDraft": "Guardar como borrador", 
         "send": "Enviar", 
-        "dontSend": "No enviar"
+        "dontSend": "Clasificar"
     },
    "MaterialTable": {
         "body": {
