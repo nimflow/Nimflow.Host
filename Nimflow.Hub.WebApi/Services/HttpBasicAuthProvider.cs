@@ -76,7 +76,7 @@ namespace Nimflow.Hub.WebApi.Services
         {
             if (_cache.TryGetValue(credential, out JwtSecurityToken jwtToken))
             {
-                if (jwtToken.ValidTo == DateTime.MinValue || jwtToken.ValidTo > DateTime.Now.AddMinutes(10))
+                if (jwtToken.ValidTo == DateTime.MinValue || jwtToken.ValidTo > DateTime.Now.AddMinutes(1))
                     return jwtToken;
             }
 
