@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Amazon.Runtime.Internal.Auth;
-using BitMiracle.LibTiff.Classic;
+using System.Threading.Tasks;
+using ImageMagick;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Nimflow.BlobStorage;
+using Nimflow.BusinessDirectory;
+using Nimflow.BusinessDirectory.Queries;
+using Nimflow.Images;
+using Nimflow.Orch.Application;
 
 namespace Nimflow.Hub.WebApi.Controllers
 {
@@ -22,179 +25,206 @@ namespace Nimflow.Hub.WebApi.Controllers
         private const string TiffBase64 =
             "SUkqAL4CAACAP+BACCQWDQeEQmFQuGQ2HQ+IRGJROKQ6BP+KxmNRuOR2PR+CxeQSOSSWTSeESKUSuWS2XQmVS+ZTOaRyYzWcTmdSmBzufT+aTegUOiSShUWkUmK0elU2nQumUh8qtXPqqAYqlID1mn0iozt9sBhPU9H9/ONyQUAgcDhBqs21geu0CvzWwsJ6Gs4v95PKEAcnEwFpVH3OiXWX1NXPZAIW+X6D4AmApHIi44ah4iVvdHJJ7o9JwsEF0sgpDIKEYrPpOz2mkAIOhwEnE21spTLNSV8KNTvY9H7MSO4gpDoLbS3cx+73m933gyXh8Xjyfkxvl3rHyXJZTLWyfvdKpl7ohGQjo8auUaeyt4DIdP51uuEaPS6fnxPweLyea2BFuGokrqoou55i6Mb5tI0zUPujT8vG8qDgWRxEumj0BIm9r3vihAJHGbcGJAd4SBYf58nytT+v+kELoe3bet/BD6wXECOwc/aDgSPA6ASNYzo7FiHQy+D5IIyTBsLGiSnsQJCnwThQRQA7iPQ26MyAhp3A6EqEP8ajLySo0THgFYZxLE6CLjLqNSuhksy2g8Ow/MDNvDB8OQ9Nb1pBN07zlOaWT5OE8StPSP0Cg04z+ltDoLRNCIwklGIJR1FJRSQAUoik2IXEUSRMgscx3HtKpNS9MonTaFSXJsnyjNVSI4u6yLMtE+zzSCRzNTtbVgirruayCDSMwlb0tLVeV6htZLK1qFu2ysvqXQqR0vCUKPTZIANU0Fmoa+kFRXacQxHM0oynCrg2XWjXIrb77PVXCSxtCCDLiBI/j2+iiXVbqPXdGaUVSh95oc2DZNpdCOW21lapPZ7urkoNxJPgle3+pOBU1EzfD+fJVFaueLvvjKP4qleH2jZOSWzlWJ5Zl6IZXmFK5lmc/5rm0wZxnMaZ3nkGZ9n7noCADwD+AAQAAQAAAAAAAAAAAQQAAQAAAD4AAAABAQQAAQAAAC8AAAACAQMAAwAAAHgDAAADAQMAAQAAAAUAAAAGAQMAAQAAAAIAAAARAQQAAQAAAAgAAAAVAQMAAQAAAAMAAAAWAQQAAQAAAC8AAAAXAQQAAQAAALYCAAAaAQUAAQAAAH4DAAAbAQUAAQAAAIYDAAAcAQMAAQAAAAEAAAAoAQMAAQAAAAIAAAA9AQMAAQAAAAIAAAAAAAAACAAIAAgAAHcBAOgDAAAAdwEA6AMAAA==";
 
+        private readonly IBlobStorageService _blobStorageService;
+        private readonly IUnitSession _unitSession;
+        private readonly IUnitsService _unitsService;
+
+        public IntegrationTestsController(IBlobStorageService blobStorageService, IUnitSession unitSession, IUnitsService unitsService)
+        {
+            _blobStorageService = blobStorageService;
+            _unitSession = unitSession;
+            _unitsService = unitsService;
+        }
+
         [HttpGet("[action]")]
         [AllowAnonymous]
-        public string Images(CancellationToken ct)
+        public async Task<string> Images(CancellationToken ct)
         {
-            var image1 = (Bitmap)new ImageConverter().ConvertFrom(Convert.FromBase64String(TiffBase64));
-            if (image1 == null)
-                throw new ApplicationException("Null image");
-            if (image1.Size.IsEmpty)
-                throw new ApplicationException("Empty image");
-            var image2 = (Bitmap)new ImageConverter().ConvertFrom(Convert.FromBase64String(TiffBase64));
-            MergeTiffUsingLibTiff(new[] { image1, image2 });
-            return "ok";
-        }
+            var units = await _unitsService.Search(new SearchUnits(), ct);
+            var unit = units.FirstOrDefault();
+            if (unit == null)
+                throw new ApplicationException("Units are empty");
+            _unitSession.SetUnitId(unit.Id);
 
-        private static void MergeTiffUsingLibTiff(IReadOnlyCollection<Bitmap> images)
-        {
-            if (images == null)
-                throw new ArgumentNullException(nameof(images));
-            var fileName = $"i-{Guid.NewGuid()}.tiff";
-            using var output = Tiff.Open(fileName, "w");
-            //var page = 0;
-            foreach (var image in images)
-            {
-                foreach (var dimensionId in image.FrameDimensionsList)
-                {
-                    //create the frame dimension 
-                    var dimension = new FrameDimension(dimensionId);
-                    //Gets the total number of frames in the .tiff file 
-                    var noOfPages = image.GetFrameCount(dimension);
-
-                    for (var index = 0; index < noOfPages; index++)
-                    {
-                        var currentFrame = new FrameDimension(dimensionId);
-                        image.SelectActiveFrame(currentFrame, index);
-                        using var tempImg = new MemoryStream();
-                        image.Save(tempImg, ImageFormat.Tiff);
-                        var bitmap = (Bitmap)Image.FromStream(tempImg);
-                        output.SetField(TiffTag.IMAGEWIDTH, bitmap.Width);
-                        output.SetField(TiffTag.IMAGELENGTH, bitmap.Height);
-                        output.SetField(TiffTag.BITSPERSAMPLE, 8);
-                        //output.SetField(TiffTag.ORIENTATION, Orientation.TOPLEFT);
-                        output.SetField(TiffTag.SAMPLESPERPIXEL, 3);
-                        output.SetField(TiffTag.ROWSPERSTRIP, bitmap.Height);
-                        //output.SetField(TiffTag.COMPRESSION, Compression.JPEG);
-                        //output.SetField(TiffTag.PHOTOMETRIC, Photometric.RGB);
-                        //output.SetField(TiffTag.FILLORDER, FillOrder.MSB2LSB);
-                        output.SetField(TiffTag.PLANARCONFIG, PlanarConfig.CONTIG);
-                        output.SetField(TiffTag.SUBFILETYPE, FileType.PAGE);
-                        //output.SetField(TiffTag.PAGENUMBER, page, pages);
-
-                        var bytes = GetImageRasterBytes(bitmap, PixelFormat.Format24bppRgb);
-                        var stride = bytes.Length / bitmap.Height;
-                        ConvertRgbSamples(bytes, bitmap.Width, bitmap.Height);
-
-                        for (int i = 0, offset = 0; i < bitmap.Height; i++)
-                        {
-                            output.WriteScanline(bytes, offset, i, 0);
-                            offset += stride;
-                        }
-                    }
-                    output.WriteDirectory();
-                }
-            }
-            output.Close();
-        }
-
-        private static byte[] GetImageRasterBytes(Bitmap bmp, PixelFormat format)
-        {
-            var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            byte[] bits;
-
+            var storagePath = "IntegrationTests/";
+            var file1Name = "file1.tiff";
+            var file1Path = $"{storagePath}/{file1Name}";
+            var file2Name = "sample-multipage.tif";
+            var file2LocalPath = $"images/{file2Name}";
+            var file2Path = $"{storagePath}/{file2Name}";
+            var targetPath = $"{storagePath}/merged.tiff";
             try
             {
-                // Lock the managed memory
-                var bmpdata = bmp.LockBits(rect, ImageLockMode.ReadWrite, format);
+                await using var image1Stream = new MemoryStream(Convert.FromBase64String(TiffBase64));
+                await _blobStorageService.Write(file1Path, image1Stream, ct);
+                if (!System.IO.File.Exists(file2LocalPath))
+                    return $"{file2LocalPath} does not exists";
+                await using var image2Stream = new FileStream(file2LocalPath, FileMode.Open, FileAccess.Read);
+                await _blobStorageService.Write(file2Path, image2Stream, ct);
 
-                // Declare an array to hold the bytes of the bitmap.
-                bits = new byte[bmpdata.Stride * bmpdata.Height];
-
-                // Copy the values into the array.
-                System.Runtime.InteropServices.Marshal.Copy(bmpdata.Scan0, bits, 0, bits.Length);
-
-                // Release managed memory
-                bmp.UnlockBits(bmpdata);
-            }
-            catch
-            {
-                return null;
-            }
-
-            return bits;
-        }
-
-        /// <summary>
-        /// Converts BGR samples into RGB samples
-        /// </summary>
-        private static void ConvertRgbSamples(IList<byte> data, int width, int height)
-        {
-            var stride = data.Count / height;
-            const int samplesPerPixel = 3;
-
-            for (var y = 0; y < height; y++)
-            {
-                var offset = stride * y;
-                var strideEnd = offset + width * samplesPerPixel;
-
-                for (var i = offset; i < strideEnd; i += samplesPerPixel)
+                var mergeRequest = new MergeStorageImagePages
                 {
-                    (data[i + 2], data[i]) = (data[i], data[i + 2]);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Merges multiple TIFF files (including multipage TIFFs) into a single multipage TIFF file.
-        /// </summary>
-        private static MemoryStream MergeTiffUsingBitmaps(IEnumerable<Image> images)
-        {
-            var stream = new MemoryStream();
-
-            //get the codec for tiff files
-            var tiffCodec = ImageCodecInfo.GetImageEncoders().FirstOrDefault(s => s.MimeType == "image/tiff");
-            if (tiffCodec == null)
-                throw new ApplicationException("Codec not found");
-
-            var encoder = Encoder.SaveFlag;
-            var ep = new EncoderParameters(1);
-
-            Bitmap pages = null;
-            foreach (var image in images)
-            {
-                foreach (var dimensionId in image.FrameDimensionsList)
-                {
-                    //create the frame dimension 
-                    var dimension = new FrameDimension(dimensionId);
-                    //Gets the total number of frames in the .tiff file 
-                    var noOfPages = image.GetFrameCount(dimension);
-
-                    for (var index = 0; index < noOfPages; index++)
+                    TargetPath = targetPath,
+                    FileUrls = new[]
                     {
-                        var currentFrame = new FrameDimension(dimensionId);
-                        image.SelectActiveFrame(currentFrame, index);
-                        using var tempImg = new MemoryStream();
-                        image.Save(tempImg, ImageFormat.Tiff);
+                        file1Path, file2Path
+                    },
+                    Pages = new[]
+                    {
+                        new PageReference
                         {
-                            if (pages == null)
-                            {
-                                //save the first frame
-                                pages = (Bitmap)Image.FromStream(tempImg);
-                                ep.Param[0] = new EncoderParameter(encoder, (long)EncoderValue.MultiFrame);
-                                pages.Save(stream, tiffCodec, ep);
-                            }
-                            else
-                            {
-                                //save the intermediate frames
-                                ep.Param[0] = new EncoderParameter(encoder, (long)EncoderValue.FrameDimensionPage);
-                                pages.SaveAdd((Bitmap)Image.FromStream(tempImg), ep);
-                            }
+                            FileIndex = 0,
+                            FilePageNumber = 0
+                        },
+                        new PageReference
+                        {
+                            FileIndex = 1,
+                            FilePageNumber = 0
+                        },
+                        new PageReference
+                        {
+                            FileIndex = 1,
+                            FilePageNumber = 2
+                        },
+                        new PageReference
+                        {
+                            FileIndex = 1,
+                            FilePageNumber = 5
                         }
                     }
+                };
+
+                var handler = new MergeStorageImagePagesHandler2(_blobStorageService);
+                var response = await handler.Handle(mergeRequest, ct);
+
+                return response.NewImagePath;
+            }
+            finally
+            {
+                await _blobStorageService.Delete(file1Path, ct);
+                await _blobStorageService.Delete(file2Path, ct);
+            }
+        }
+    }
+
+    // ReSharper disable once UnusedMember.Global
+    public class MergeStorageImagePagesHandler2 : IRequestHandler<MergeStorageImagePages, MergeStorageImagePagesResult>
+    {
+        private readonly IBlobStorageService _blobStorageService;
+
+        public MergeStorageImagePagesHandler2(IBlobStorageService blobStorageService)
+        {
+            _blobStorageService = blobStorageService;
+        }
+
+        public Task<MergeStorageImagePagesResult> Handle(MergeStorageImagePages request, CancellationToken cancellationToken)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request.Pages == null) throw new ArgumentException($"Unassigned {nameof(request.Pages)}");
+            if (request.FileUrls == null) throw new ArgumentException($"Unassigned {nameof(request.FileUrls)}");
+            if (string.IsNullOrWhiteSpace(request.TargetPath)) throw new ArgumentException($"Unassigned {nameof(request.TargetPath)}");
+            return DoMerge(request, cancellationToken);
+        }
+
+        private async Task<MergeStorageImagePagesResult> DoMerge(MergeStorageImagePages request, CancellationToken ct)
+        {
+            var images = await GetSortedImages(request, ct);
+
+            await using (var mergedStream = await MergeTiff(images, ct))
+            {
+                await _blobStorageService.Write(request.TargetPath, mergedStream, ct);
+            }
+
+            foreach (var image in images)
+            {
+                try
+                {
+                    image.Dispose();
+                }
+                catch
+                {
+                    //ignore
                 }
             }
 
-            if (pages != null)
+            return new MergeStorageImagePagesResult
             {
-                //flush and close.
-                ep.Param[0] = new EncoderParameter(encoder, (long)EncoderValue.Flush);
-                pages.SaveAdd(ep);
+                NewImagePath = request.TargetPath
+            };
+        }
+
+        private async Task<IReadOnlyCollection<IMagickImage<ushort>>> GetSortedImages(MergeStorageImagePages request, CancellationToken ct)
+        {
+            var imagesByFileIndex = await ExtractImages(request, ct);
+            var pages = new List<IMagickImage<ushort>>();
+            foreach (var page in request.Pages)
+            {
+                if (!imagesByFileIndex.TryGetValue(page.FileIndex, out var fileImagesByPages))
+                    throw new ApplicationException($"Page {page.FileIndex} not found in {nameof(imagesByFileIndex)}");
+                if (!fileImagesByPages.TryGetValue(page.FilePageNumber, out var image))
+                    throw new ApplicationException($"Page number: {page.FilePageNumber} not found in file with index {page.FileIndex}");
+                pages.Add(image);
             }
 
-            stream.Position = 0;
+            return pages;
+        }
 
-            return stream;
+        private async Task<Dictionary<int, IDictionary<int, IMagickImage<ushort>>>> ExtractImages(MergeStorageImagePages request, CancellationToken cancellationToken)
+        {
+            var result = new Dictionary<int, IDictionary<int, IMagickImage<ushort>>>();
+            foreach (var fileIndex in request.Pages.GroupBy(s => s.FileIndex).Select(s => s.Key))
+            {
+                if (fileIndex >= request.FileUrls.Length)
+                    throw new ApplicationException($"There is not a FileUrl with index: {fileIndex}");
+                var fileUrl = request.FileUrls[fileIndex];
+                if (string.IsNullOrWhiteSpace(fileUrl))
+                    throw new ApplicationException($"Unassigned FileUrl with index: {fileIndex}");
+                try
+                {
+                    await using var stream = await _blobStorageService.OpenRead(fileUrl, cancellationToken);
+                    if (stream == null)
+                        throw new ApplicationException($"Image at {fileUrl} not found.");
+                    var pageIndices = request.Pages.Where(s => s.FileIndex == fileIndex).Select(s => s.FilePageNumber);
+                    stream.Position = 0;
+                    var pages = GetPages(stream, pageIndices);
+                    result[fileIndex] = pages;
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"Error reading page: {fileUrl}, with message: {e.Message}", e);
+                }
+            }
+
+            return result;
+        }
+
+        private static IDictionary<int, IMagickImage<ushort>> GetPages(Stream stream, IEnumerable<int> pageNumbers)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            var images = new Dictionary<int, IMagickImage<ushort>>();
+            using var imageCollection = new MagickImageCollection(stream);
+            foreach (var pageNumber in pageNumbers)
+            {
+                if (pageNumber >= imageCollection.Count)
+                    throw new ApplicationException($"The image does not contain a page with index: {pageNumber}");
+                images[pageNumber] = new MagickImage(imageCollection[pageNumber]);
+            }
+
+            return images;
+        }
+
+        private static async Task<MemoryStream> MergeTiff(IEnumerable<IMagickImage<ushort>> images, CancellationToken ct)
+        {
+            var collection = new MagickImageCollection();
+
+            foreach (var image in images)
+            {
+                collection.Add(image);
+            }
+
+            var memoryStream = new MemoryStream();
+            await collection.WriteAsync(memoryStream, ct);
+            return memoryStream;
         }
     }
 }
