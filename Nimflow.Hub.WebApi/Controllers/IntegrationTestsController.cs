@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ImageMagick;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Nimflow.BlobStorage;
 using Nimflow.BusinessDirectory;
 using Nimflow.BusinessDirectory.Queries;
+using Nimflow.ExecutionContext;
 using Nimflow.Images;
 using Nimflow.Orch.Application;
 
@@ -28,17 +28,30 @@ namespace Nimflow.Hub.WebApi.Controllers
         private readonly IBlobStorageService _blobStorageService;
         private readonly IUnitSession _unitSession;
         private readonly IUnitsService _unitsService;
+        private readonly IMediator _mediator;
+        private readonly IExecutionContext _executionContext;
+        private readonly ILogger<IntegrationTestsController> _logger;
 
-        public IntegrationTestsController(IBlobStorageService blobStorageService, IUnitSession unitSession, IUnitsService unitsService)
+        public IntegrationTestsController(
+            IBlobStorageService blobStorageService, 
+            IUnitSession unitSession, 
+            IUnitsService unitsService, 
+            IMediator mediator, 
+            IExecutionContext executionContext,
+            ILogger<IntegrationTestsController> logger
+            )
         {
             _blobStorageService = blobStorageService;
             _unitSession = unitSession;
             _unitsService = unitsService;
+            _mediator = mediator;
+            _executionContext = executionContext;
+            _logger = logger;
         }
 
         [HttpGet("[action]")]
         [AllowAnonymous]
-        public async Task<string> Images(CancellationToken ct)
+        public async Task<IActionResult> Images(CancellationToken ct)
         {
             var units = await _unitsService.Search(new SearchUnits(), ct);
             var unit = units.FirstOrDefault();
@@ -58,7 +71,7 @@ namespace Nimflow.Hub.WebApi.Controllers
                 await using var image1Stream = new MemoryStream(Convert.FromBase64String(TiffBase64));
                 await _blobStorageService.Write(file1Path, image1Stream, ct);
                 if (!System.IO.File.Exists(file2LocalPath))
-                    return $"{file2LocalPath} does not exists";
+                    throw new ApplicationException($"{file2LocalPath} does not exists");
                 await using var image2Stream = new FileStream(file2LocalPath, FileMode.Open, FileAccess.Read);
                 await _blobStorageService.Write(file2Path, image2Stream, ct);
 
@@ -94,137 +107,41 @@ namespace Nimflow.Hub.WebApi.Controllers
                     }
                 };
 
-                var handler = new MergeStorageImagePagesHandler2(_blobStorageService);
-                var response = await handler.Handle(mergeRequest, ct);
+                _executionContext.AutomationRunning = true;
+                var response = await _mediator.Send(mergeRequest, ct);
+                var numberOfPages = await _mediator.Send(new GetStorageImageFrameCount { Path = response.NewImagePath }, ct);
+                _logger.LogInformation($"Merged to {response.NewImagePath} with: {numberOfPages} pages OK!");
 
-                return response.NewImagePath;
+                var command = new OpenRead { Path = targetPath };
+                var stream = await _mediator.Send(command, ct);
+                if (stream == null)
+                    return NotFound();
+                stream.Position = 0;
+                return ExtensionsMapping.TryGetContentType(command.Path, out var contentType)
+                    ? new FileStreamResult(stream, contentType)
+                    : new FileStreamResult(stream, "application/unknown");
             }
             finally
             {
-                await _blobStorageService.Delete(file1Path, ct);
-                await _blobStorageService.Delete(file2Path, ct);
+                await CleanUpImages(file1Path, file2Path, targetPath);
             }
         }
-    }
 
-    // ReSharper disable once UnusedMember.Global
-    public class MergeStorageImagePagesHandler2 : IRequestHandler<MergeStorageImagePages, MergeStorageImagePagesResult>
-    {
-        private readonly IBlobStorageService _blobStorageService;
-
-        public MergeStorageImagePagesHandler2(IBlobStorageService blobStorageService)
+        private async Task CleanUpImages(params string[] paths)
         {
-            _blobStorageService = blobStorageService;
-        }
-
-        public Task<MergeStorageImagePagesResult> Handle(MergeStorageImagePages request, CancellationToken cancellationToken)
-        {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (request.Pages == null) throw new ArgumentException($"Unassigned {nameof(request.Pages)}");
-            if (request.FileUrls == null) throw new ArgumentException($"Unassigned {nameof(request.FileUrls)}");
-            if (string.IsNullOrWhiteSpace(request.TargetPath)) throw new ArgumentException($"Unassigned {nameof(request.TargetPath)}");
-            return DoMerge(request, cancellationToken);
-        }
-
-        private async Task<MergeStorageImagePagesResult> DoMerge(MergeStorageImagePages request, CancellationToken ct)
-        {
-            var images = await GetSortedImages(request, ct);
-
-            await using (var mergedStream = await MergeTiff(images, ct))
-            {
-                await _blobStorageService.Write(request.TargetPath, mergedStream, ct);
-            }
-
-            foreach (var image in images)
+            if (paths == null)
+                return;
+            foreach (var path in paths)
             {
                 try
                 {
-                    image.Dispose();
-                }
-                catch
-                {
-                    //ignore
-                }
-            }
-
-            return new MergeStorageImagePagesResult
-            {
-                NewImagePath = request.TargetPath
-            };
-        }
-
-        private async Task<IReadOnlyCollection<IMagickImage<ushort>>> GetSortedImages(MergeStorageImagePages request, CancellationToken ct)
-        {
-            var imagesByFileIndex = await ExtractImages(request, ct);
-            var pages = new List<IMagickImage<ushort>>();
-            foreach (var page in request.Pages)
-            {
-                if (!imagesByFileIndex.TryGetValue(page.FileIndex, out var fileImagesByPages))
-                    throw new ApplicationException($"Page {page.FileIndex} not found in {nameof(imagesByFileIndex)}");
-                if (!fileImagesByPages.TryGetValue(page.FilePageNumber, out var image))
-                    throw new ApplicationException($"Page number: {page.FilePageNumber} not found in file with index {page.FileIndex}");
-                pages.Add(image);
-            }
-
-            return pages;
-        }
-
-        private async Task<Dictionary<int, IDictionary<int, IMagickImage<ushort>>>> ExtractImages(MergeStorageImagePages request, CancellationToken cancellationToken)
-        {
-            var result = new Dictionary<int, IDictionary<int, IMagickImage<ushort>>>();
-            foreach (var fileIndex in request.Pages.GroupBy(s => s.FileIndex).Select(s => s.Key))
-            {
-                if (fileIndex >= request.FileUrls.Length)
-                    throw new ApplicationException($"There is not a FileUrl with index: {fileIndex}");
-                var fileUrl = request.FileUrls[fileIndex];
-                if (string.IsNullOrWhiteSpace(fileUrl))
-                    throw new ApplicationException($"Unassigned FileUrl with index: {fileIndex}");
-                try
-                {
-                    await using var stream = await _blobStorageService.OpenRead(fileUrl, cancellationToken);
-                    if (stream == null)
-                        throw new ApplicationException($"Image at {fileUrl} not found.");
-                    var pageIndices = request.Pages.Where(s => s.FileIndex == fileIndex).Select(s => s.FilePageNumber);
-                    stream.Position = 0;
-                    var pages = GetPages(stream, pageIndices);
-                    result[fileIndex] = pages;
+                    await _blobStorageService.Delete(path, CancellationToken.None);
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"Error reading page: {fileUrl}, with message: {e.Message}", e);
+                    _logger.LogError($"Error trying to delete testing file at path: {path} from blob storage. Error: {e.Message}");
                 }
             }
-
-            return result;
-        }
-
-        private static IDictionary<int, IMagickImage<ushort>> GetPages(Stream stream, IEnumerable<int> pageNumbers)
-        {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-            var images = new Dictionary<int, IMagickImage<ushort>>();
-            using var imageCollection = new MagickImageCollection(stream);
-            foreach (var pageNumber in pageNumbers)
-            {
-                if (pageNumber >= imageCollection.Count)
-                    throw new ApplicationException($"The image does not contain a page with index: {pageNumber}");
-                images[pageNumber] = new MagickImage(imageCollection[pageNumber]);
-            }
-
-            return images;
-        }
-
-        private static async Task<MemoryStream> MergeTiff(IEnumerable<IMagickImage<ushort>> images, CancellationToken ct)
-        {
-            var collection = new MagickImageCollection();
-
-            foreach (var image in images)
-            {
-                collection.Add(image);
-            }
-
-            var memoryStream = new MemoryStream();
-            await collection.WriteAsync(memoryStream, ct);
-            return memoryStream;
         }
     }
 }
