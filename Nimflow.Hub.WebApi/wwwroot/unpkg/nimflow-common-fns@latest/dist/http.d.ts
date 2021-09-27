@@ -20,6 +20,7 @@ export interface PostMultipartForm extends HttpRequest {
         value: string;
     }[] | undefined;
     base64FileEntries: {
+        name?: string;
         fileName: string;
         base64: string;
     }[] | undefined;
