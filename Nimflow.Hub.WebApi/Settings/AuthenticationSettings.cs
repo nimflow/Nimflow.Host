@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Nimflow.Hub.WebApi.Settings
 {
+    [ExcludeFromCodeCoverage]
     public class AuthenticationSettings
     {
         public ApiKeyAuthenticationSettings ApiKey { get; set; }
@@ -12,7 +14,7 @@ namespace Nimflow.Hub.WebApi.Settings
 
         public IEnumerable<SchemeAuthenticationSettings> GetEnabledSchemeAuthenticationSettings()
         {
-            return new SchemeAuthenticationSettings[] {ApiKey, Basic, Bearer, Negotiate}.Where(s => s is {Enabled: true});
+            return new SchemeAuthenticationSettings[] { ApiKey, Basic, Bearer, Negotiate }.Where(s => s is { Enabled: true });
         }
     }
 }

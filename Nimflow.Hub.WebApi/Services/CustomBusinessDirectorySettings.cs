@@ -1,5 +1,8 @@
-﻿namespace Nimflow.Hub.WebApi.Services
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Nimflow.Hub.WebApi.Services
 {
+    [ExcludeFromCodeCoverage]
     public class CustomBusinessDirectorySettings
     {
         public string OrganizationId { get; set; }

@@ -39,6 +39,7 @@ using Serilog;
 
 namespace Nimflow.Hub.WebApi
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         private const string AllowAnyOrigin = "AllowAnyOrigin";
@@ -175,7 +176,6 @@ namespace Nimflow.Hub.WebApi
             Log.Logger.Information($"Starting with environment {env?.EnvironmentName}");
         }
 
-        [ExcludeFromCodeCoverage]
         private static void UseSpaFileServer(IApplicationBuilder app, IWebHostEnvironment env, string name, IEnumerable<string> defaultFileNames)
         {
             var portalFsOptions = new FileServerOptions
@@ -195,7 +195,6 @@ namespace Nimflow.Hub.WebApi
             app.UseFileServer(portalFsOptions);
         }
 
-        [ExcludeFromCodeCoverage]
         private static void ConfigureProblemDetails(ProblemDetailsOptions options)
         {
             options.IncludeExceptionDetails = (ctx, ex) =>
@@ -251,7 +250,6 @@ namespace Nimflow.Hub.WebApi
             });
         }
 
-        [ExcludeFromCodeCoverage]
         public void AddAuthenticationScheme(IServiceCollection services, AuthenticationBuilder authenticationBuilder, BasicAuthenticationSettings settings)
         {
             authenticationBuilder.AddBasic(_ => { });
@@ -269,7 +267,6 @@ namespace Nimflow.Hub.WebApi
             authenticationBuilder.AddJwtBearer(options => ConfigureJwtBearerScheme(settings, options));
         }
 
-        [ExcludeFromCodeCoverage]
         private static void ConfigureJwtBearerScheme(BearerAuthenticationSettings settings, JwtBearerOptions options)
         {
             options.Authority = settings.Authority;
@@ -293,13 +290,11 @@ namespace Nimflow.Hub.WebApi
             };
         }
 
-        [ExcludeFromCodeCoverage]
         public void AddAuthenticationScheme(IServiceCollection services, AuthenticationBuilder authenticationBuilder, NegotiateAuthenticationSettings settings)
         {
             authenticationBuilder.AddNegotiate(options => { ConfigureNegotiateScheme(settings, options); });
         }
 
-        [ExcludeFromCodeCoverage]
         private static void ConfigureNegotiateScheme(NegotiateAuthenticationSettings settings, NegotiateOptions options)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Nimflow.Hub.WebApi.Settings
 {
+    [ExcludeFromCodeCoverage]
     public class BearerAuthenticationSettings : SchemeAuthenticationSettings
     {
         public string Authority { get; set; }
