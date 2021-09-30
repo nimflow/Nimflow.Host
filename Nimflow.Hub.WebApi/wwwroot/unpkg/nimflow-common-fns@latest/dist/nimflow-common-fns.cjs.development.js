@@ -450,11 +450,23 @@ function getStorageImageFrameCount(parameters) {
     parameters: parameters
   });
 }
+/**
+ * Converts a base64 or dataUrl of an image to a specified target format
+ */
+
+function convertImage(parameters) {
+  return call({
+    moduleName: moduleName$6,
+    name: 'ConvertImage',
+    parameters: parameters
+  });
+}
 
 var images = {
   __proto__: null,
   mergeStorageImagePages: mergeStorageImagePages,
-  getStorageImageFrameCount: getStorageImageFrameCount
+  getStorageImageFrameCount: getStorageImageFrameCount,
+  convertImage: convertImage
 };
 
 exports.blobStorage = blobStorage;
