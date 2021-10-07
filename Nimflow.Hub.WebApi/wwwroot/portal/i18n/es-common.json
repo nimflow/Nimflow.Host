@@ -162,11 +162,11 @@
     "Password": "Contraseña",
     "Action": "Acción",
     "RecognizedDocumentAction": {
-        "saveAsDraft": "Guardar como borrador", 
-        "send": "Enviar", 
+        "saveAsDraft": "Guardar como borrador",
+        "send": "Enviar",
         "dontSend": "Clasificar"
     },
-   "MaterialTable": {
+    "MaterialTable": {
         "body": {
             "emptyDataSourceMessage": "Sin registros para mostrar",
             "filterRow": {
@@ -215,5 +215,8 @@
             "searchAriaLabel": "Buscar",
             "clearSearchAriaLabel": "Limpiar búsqueda"
         }
-    }
+    },
+    "AnotherUserCouldBeWorkingOnTheSameTask": "Otro usuario podría estar trabajando sobre la misma tarea",
+    "RecentUserTaskActivityRecords": "Actividad reciente de usuarios sobre la tarea",
+    "Warning": "Precaución"
 }

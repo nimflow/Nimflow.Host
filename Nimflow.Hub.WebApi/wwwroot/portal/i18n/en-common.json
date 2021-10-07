@@ -186,5 +186,8 @@
             "searchAriaLabel": "Search",
             "clearSearchAriaLabel": "Clear Search"
         }
-    }
+    },
+    "AnotherUserCouldBeWorkingOnTheSameTask": "Another user could be working on the same task",
+    "RecentUserTaskActivityRecords": "Recent user task activity records",
+    "Warning": "Warning"
 }
