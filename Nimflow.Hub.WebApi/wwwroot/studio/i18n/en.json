@@ -481,6 +481,21 @@
         "send": "Send", 
         "dontSend": "Do not send"
     },
+    "GotoFirstPage": "Go to first page",
+    "GotoPrevPage": "Go to previous page",
+    "GotoNextPage": "Go to next page",
+    "GotoLastPage": "Go to last page",
+    "DocumentType": "Document type",
+    "Rotate90Ccw": "Rotate 90º counterclockwise",
+    "Rotate90Cw": "Rotate 90º clockwise",
+    "Rotate180": "Rotate 180º",
+    "Rotate1Ccw": "Rotate 1º counterclockwise",
+    "Rotate1Cw": "Rotate 1º clockwise",
+    "RotateAll90Ccw": "Rotate all images 90º counterclockwise",
+    "RotateAll90Cw": "Rotate all images 90º clockwise",
+    "RotateAll180": "Rotate all images 180º",
+    "RotateAll1Ccw": "Rotate all images 1º counterclockwise",
+    "RotateAll1Cw": "Rotate all images 1º clockwise",
     "Yup": {
         "mixed": {
             "default": "The field is invalid",
@@ -571,5 +586,9 @@
             "searchTooltip": "Search",
             "searchPlaceholder": "Search"
         }
-    }
+    },
+    "FitWidth": "Fit width",
+    "FitPage": "Fit page",
+    "ZoomIn": "Zoom in",
+    "ZoomOut": "Zoom out"
 }

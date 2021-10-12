@@ -561,6 +561,23 @@
         "send": "Enviar", 
         "dontSend": "No enviar"
     },
+    "GotoFirstPage": "Ir a inicio",
+    "GotoPrevPage": "Ir a anterior",
+    "GotoNextPage": "Ir a siguiente",
+    "GotoLastPage": "Ir a final",
+    "DocumentType": "Tipo de documento",
+    "Rotate90Ccw": "Rotar 90º en sentido anti-horario (Shift para todas)",
+    "Rotate90Cw": "Rotar 90º en sentido horario (Shift para todas)",
+    "Rotate180": "Rotar 180º (Shift para todas)",
+    "Rotate1Ccw": "Rotar 1º en sentido anti-horario (Shift para todas)",
+    "Rotate1Cw": "Rotar 1º en sentido horario (Shift para todas)",
+    "RotateAll90Ccw": "Rotar todas las imágenes 90º en sentido anti-horario",
+    "RotateAll90Cw": "Rotar todas las imágenes 90º en sentido horario",
+    "RotateAll180": "Rotar todas las imágenes 180º",
+    "RotateAll1Ccw": "Rotar todas las imágenes 1º en sentido anti-horario",
+    "RotateAll1Cw": "Rotar todas las imágenes 1º en sentido horario",
+    "Crop": "Recortar",
+    "Move": "Mover",
     "Yup": {
         "mixed": {
             "default": "El campo es inválido",
@@ -651,5 +668,9 @@
             "searchTooltip": "Buscar",
             "searchPlaceholder": "Buscar"
         }
-    }
+    },
+    "FitWidth": "Ajustar al ancho",
+    "FitPage": "Ajustar al tamaño de página",
+    "ZoomIn": "Acercar",
+    "ZoomOut": "Alejar"
 }
