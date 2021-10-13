@@ -141,7 +141,7 @@
     "LosingOwnershipTitle": "¡Está a punto de perder la propiedad de la unidad!",
     "LosingOwnershipDescription": "Ha seleccionado eliminar el rol owner de su usuario. Eso tendrá como consecuencia que no podrá seguir accediendo a esta página de seguridad. ¿Está seguro que desea remover el rol?",
     "UnknownOrganization": "Organización desconocida",
-    "PageN": "Página nro. {{index}}",
+    "PageN": "Página {{index}}",
     "DocumentN": "Documento nro. {{index}}",
     "OrphanPages": "Páginas sin usar",
     "CapturedImages": "Imágenes capturadas",

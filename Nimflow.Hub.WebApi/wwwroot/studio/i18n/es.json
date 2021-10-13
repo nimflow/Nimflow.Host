@@ -535,7 +535,7 @@
         "High": "Alta"
     },
     "EnterImportanceExpression": "Ingrese una expresión para la importancia. Debe retornar un string con valor 'low', 'normal' o 'high' o un número -1 para bajo; 0 para normal o 1 para alta.",
-    "PageN": "Página nro. {{index}}",
+    "PageN": "Página {{index}}",
     "DocumentN": "Documento nro. {{index}}",
     "OrphanPages": "Páginas sin usar",
     "CapturedImages": "Imágenes capturadas",
