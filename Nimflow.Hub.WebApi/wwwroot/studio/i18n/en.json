@@ -590,5 +590,9 @@
     "FitWidth": "Fit width",
     "FitPage": "Fit page",
     "ZoomIn": "Zoom in",
-    "ZoomOut": "Zoom out"
+    "ZoomOut": "Zoom out",
+    "ExcludeNewContextStateKeysFromEventsStorage": "Exclude state keys from events storage",
+    "ExcludeTaskDataKeysFromEventsStorage": "Exclude task data keys from events storage",
+    "ExcludePayloadKeysFromEventStorage": "Exclude payload keys from event storage",
+    "ExcludeStringPlaceHolder": "Comma separated. * to exclude all."
 }

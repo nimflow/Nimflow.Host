@@ -671,5 +671,9 @@
     "FitWidth": "Ajustar al ancho",
     "FitPage": "Ajustar al tamaño de página",
     "ZoomIn": "Acercar",
-    "ZoomOut": "Alejar"
+    "ZoomOut": "Alejar",
+    "ExcludeNewContextStateKeysFromEventsStorage": "Excluir claves del state al guardar eventos",
+    "ExcludeTaskDataKeysFromEventsStorage": "Excluir claves de taskData al guardar los eventos",
+    "ExcludePayloadKeysFromEventStorage": "Excluir claves del payload al guardar los eventos",
+    "ExcludeStringPlaceHolder": "Claves separadas con coma. * para excluir todos."
 }
