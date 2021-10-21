@@ -119,6 +119,7 @@
     "FreeVariable-State": "A reference to the state property current context",
     "FreeVariable-Payload": "The payload passed with the action",
     "FreeVariable-Task": "A reference to the task instance defining this response",
+    "FreeVariable-ResponseData": "The add-response-command basic data (requires HUB v4.2+)",
     "ErrorSavingContextType": "Error saving context type",
     "Milestone": "Milestone",
     "NoMilestone": "No milestone",
@@ -594,5 +595,20 @@
     "ExcludeNewContextStateKeysFromEventsStorage": "Exclude state keys from events storage",
     "ExcludeTaskDataKeysFromEventsStorage": "Exclude task data keys from events storage",
     "ExcludePayloadKeysFromEventStorage": "Exclude payload keys from event storage",
-    "ExcludeStringPlaceHolder": "Comma separated. * to exclude all."
+    "ExcludeStringPlaceHolder": "Comma separated. * to exclude all.",
+    "ViewEventFailures": "View event failures",
+    "TimeStamp": "Moment",
+    "ExceptionMessage": "Error message",
+    "EventFailures": "Event failures",
+    "ViewEventData": "View event data",
+    "EventData": "Event data",
+    "EventListenerFailureStatus": {
+        "Pending": "Pending",
+        "Solved": "Solved",
+        "Canceled": "Canceled"
+    },
+    "ConfirmCancelEvent": "This will permanently cancel the event",
+    "ConfirmCancelAllEvents": "This will permanently cancel all the pending events",
+    "RetryAll": "Retry all",
+    "CancelAll": "Cancel all"
 }

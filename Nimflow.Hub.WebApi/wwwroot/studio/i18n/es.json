@@ -144,6 +144,7 @@
     "FreeVariable-State": "Referencia a la propiedad 'state' del contexto actual",
     "FreeVariable-Payload": "Datos asociados a la acción",
     "FreeVariable-Task": "Referencia a la tarea que define esta respuesta",
+    "FreeVariable-ResponseData": "Datos básicos sobre el comando que envió la respuesta (requiere HUB v4.2 en adelante)",
     "ErrorSavingContextType": "Error al guardar el tipo de contexto",
     "ValueIsNotAnIdentifier": "La cadena solo puede contener letras, dígitos, guiones y guiones bajos, y pueden arrancar solo con una letra o un guión bajo",
     "EnterHandlebarsTemplate": "Ingrese una plantilla Handlebars",
@@ -675,5 +676,21 @@
     "ExcludeNewContextStateKeysFromEventsStorage": "Excluir claves del state al guardar eventos",
     "ExcludeTaskDataKeysFromEventsStorage": "Excluir claves de taskData al guardar los eventos",
     "ExcludePayloadKeysFromEventStorage": "Excluir claves del payload al guardar los eventos",
-    "ExcludeStringPlaceHolder": "Claves separadas con coma. * para excluir todos."
+    "ExcludeStringPlaceHolder": "Claves separadas con coma. * para excluir todos.",
+    "ViewEventFailures": "Ver eventos con errores",
+    "TimeStamp": "Momento",
+    "ExceptionMessage": "Mensaje de error",
+    "EventFailures": "Eventos con errores",
+    "ViewEventData": "Ver datos del evento",
+    "Retry": "Reintentar",
+    "EventData": "Datos del evento",
+    "EventListenerFailureStatus": {
+        "Pending": "Pendiente",
+        "Solved": "Resuelto",
+        "Canceled": "Cancelado"
+    },
+    "ConfirmCancelEvent": "Se cancelará el evento de forma permanente",
+    "ConfirmCancelAllEvents": "Se cancelarán todos los eventos pendientes de forma permanente",
+    "RetryAll": "Reintentar todos",
+    "CancelAll": "Cancelar todos"
 }
