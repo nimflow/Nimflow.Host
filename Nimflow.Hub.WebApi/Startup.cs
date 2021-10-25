@@ -167,6 +167,10 @@ namespace Nimflow.Hub.WebApi
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync(string.Empty);
+                });
                 endpoints.MapControllers();
                 endpoints.MapHangfireDashboard();
                 endpoints.MapHealthChecks("/health");
