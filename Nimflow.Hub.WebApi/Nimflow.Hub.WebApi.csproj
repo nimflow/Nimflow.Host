@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>f3ce0453-956f-4faf-b23c-39f06dcb203a</UserSecretsId>
-    <Version>1.9.1</Version>
+    <Version>1.9.2</Version>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
@@ -33,7 +33,7 @@
   <ItemGroup>
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="8.3.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="5.0.9" />
-    <PackageReference Include="Nimflow.Hub.AspNet" Version="4.4.1" />
+    <PackageReference Include="Nimflow.Hub.AspNet" Version="4.6.4" />
     <PackageReference Include="Auth0.AuthenticationApi" Version="7.8.1" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="5.4.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.18.0" />
