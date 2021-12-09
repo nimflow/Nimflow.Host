@@ -142,8 +142,9 @@
     "LosingOwnershipDescription": "Ha seleccionado eliminar el rol owner de su usuario. Eso tendrá como consecuencia que no podrá seguir accediendo a esta página de seguridad. ¿Está seguro que desea remover el rol?",
     "UnknownOrganization": "Organización desconocida",
     "PageN": "Página {{index}}",
-    "DocumentN": "Documento nro. {{index}}",
-    "OrphanPages": "Páginas sin usar",
+    "DocumentN": "Documento nro. {{index}} ({{count}})",
+    "OrphanPages": "Páginas sin usar ({{count}})",
+    "NamedDocumentN": "{{index}} - {{title}} ({{count}})",
     "CapturedImages": "Imágenes capturadas",
     "ExtractingImages": "Extrayendo imágenes",
     "ExtractImages": "Extraer imágenes",
@@ -239,5 +240,12 @@
     "FitWidth": "Ajustar al ancho",
     "FitPage": "Ajustar al tamaño de página",
     "ZoomIn": "Acercar",
-    "ZoomOut": "Alejar"
+    "ZoomOut": "Alejar",
+    "StartTime": "Desde",
+    "EndTime": "Hasta",
+    "TotalTaskCount": "Total de tareas: {{total}}",
+    "RecognizedTextCopiedToClipboard": "El texto reconocido ha sido copiado al portapapeles",
+    "RecognizedTextCouldNotBeCopiedToClipboard": "El texto reconocido ha podido ser copiado al portapapeles",
+    "TextRecognitionFunctionFailed": "La función de reconocimiento de texto falló",
+    "Search": "Buscar"
 }

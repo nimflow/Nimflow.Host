@@ -117,8 +117,9 @@
     "LosingOwnershipDescription": "You have selected to remove the owner roles from your user. That means that you will not be able to continue using this security page. Are you sure you want to remove the role?",
     "UnknownOrganization": "Unknown organization",
     "PageN": "Page nr. {{index}}",
-    "DocumentN": "Document nr. {{index}}",
-    "OrphanPages": "Unused pages",
+    "DocumentN": "Document nr. {{index}} ({{count}})",
+    "OrphanPages": "Unused pages ({{count}})",
+    "NamedDocumentN": "{{index}} - {{title}} ({{count}})",
     "CapturedImages": "Captured images",
     "ExtractingImages": "Extracting images",
     "ExtractImages": "Extract images",
@@ -208,5 +209,13 @@
     "FitWidth": "Fit width",
     "FitPage": "Fit page",
     "ZoomIn": "Zoom in",
-    "ZoomOut": "Zoom out"
+    "ZoomOut": "Zoom out",
+    "StartTime": "From",
+    "EndTime": "To",
+    "TotalTaskCount": "Total tasks: {{total}}",
+    "RecognizedTextCopiedToClipboard": "The text recognized has been copied to the clipboard",
+    "RecognizedTextCouldNotBeCopiedToClipboard": "The text recognized could not be copied to the clipboard",
+    "TextRecognitionFunctionFailed": "The text recognition function failed",
+    "OcrCapture": "Recognize text in selection",
+    "OcrCapture": "Reconocer texto en selección"
 }
