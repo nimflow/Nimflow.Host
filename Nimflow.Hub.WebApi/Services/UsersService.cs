@@ -17,12 +17,20 @@ namespace Nimflow.Hub.WebApi.Services
 
         public Task<User> FindById(string id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new User
+            {
+                Id = id,
+                EmailVerified = false
+            });
         }
 
         public Task<User> FindByEmail(string emailAddress, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new User
+            {
+                Email = emailAddress,
+                EmailVerified = true
+            });
         }
     }
 }
