@@ -18,7 +18,7 @@ namespace Nimflow.Hub.WebApi.Services
                 return Array.Empty<string>();
             var roleNames = GetRoleNames(jwtToken, settings);
             return roleNames != null
-                ? roleNames.SelectMany(RoleActions.GetActionsByRole).Distinct().ToArray()
+                ? roleNames.SelectMany(RoleActions.GetActionsByBuiltInRole).Distinct().ToArray()
                 : Array.Empty<string>();
         }
 
