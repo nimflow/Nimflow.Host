@@ -33,6 +33,7 @@ using Nimflow.Hub.AspNet.Controllers;
 using Nimflow.Hub.WebApi.Services;
 using Nimflow.Hub.WebApi.Settings;
 using Nimflow.Images;
+using Nimflow.Orch.Application.ApiManagement;
 using Nimflow.Users;
 using NJsonSchema;
 using Serilog;
@@ -93,6 +94,7 @@ namespace Nimflow.Hub.WebApi
                         builder.AllowAnyMethod();
                     });
             });
+            services.AddScoped<IApiManagementClient, NotSupportedApiManagementClient>();
             services.AddApplicationInsightsTelemetry();
             services.AddProblemDetails(ConfigureProblemDetails);
             services.Configure<HostOptions>(options => { options.ShutdownTimeout = TimeSpan.FromSeconds(60); });
