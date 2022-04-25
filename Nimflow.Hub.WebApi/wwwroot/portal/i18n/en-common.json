@@ -11,11 +11,13 @@
     "Reference": "Reference",
     "LastUpdated": "Last Updated",
     "AssignedTo": "Assigned To",
+    "AssignedToRole": "Assigned to role",
     "UnauthorizedMessage": "You are not authorized to access this page",
     "UnitMembers": "Unit members",
     "UnitTasks": "Unit tasks",
     "Security": "Security",
     "DispatchActions": "Execute actions",
+    "StartDate": "Start date",
     "DueDate": "Due date",
     "LowImportance": "Low",
     "NormalImportance": "Normal",
@@ -246,5 +248,8 @@
     "write_packages": "Write packages",
     "read_storage": "Read storage",
     "write_storage": "Write storage",
-    "KeyboardOcrToolActiveStatus": "Extract and paste text from image (Esc to cancel)"
+    "KeyboardOcrToolActiveStatus": "Extract and paste text from image (Esc to cancel)",
+    "InviteUser": "Invite user",
+    "ThereArePendingChanges": "There are changes pending",
+    "ChangesWillBeLost_Continue": "All changes will be lost. Continue?"
 }

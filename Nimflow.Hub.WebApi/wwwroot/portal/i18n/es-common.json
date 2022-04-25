@@ -14,6 +14,7 @@
     "Created": "Creado",
     "LastUpdated": "Última actualización",
     "AssignedTo": "Asignado a",
+    "AssignedToRole": "Asignado a rol",
     "Responses": "Respuestas",
     "Tasks": "Tareas",
     "Accept": "Aceptar",
@@ -23,6 +24,7 @@
     "UnitTasks": "Tareas de la unidad",
     "Security": "Seguridad",
     "DispatchActions": "Ejecutar acciones",
+    "StartDate": "Inicio",
     "DueDate": "Vencimiento",
     "Importance": "Importancia",
     "LowImportance": "Baja",
@@ -279,5 +281,9 @@
     "write_packages": "Modificar paquetes",
     "read_storage": "Leer archivos",
     "write_storage": "Modificar archivos",
-    "KeyboardOcrToolActiveStatus": "Extraer y pegar texto de imagen (Esc para cancelar)"
+    "KeyboardOcrToolActiveStatus": "Extraer y pegar texto de imagen (Esc para cancelar)",
+    "InviteUser": "Invitar usuario",
+    "ThereArePendingChanges": "Existen cambios pendientes",
+    "ChangesWillBeLost_Continue": "Todos los cambios se perderán. ¿Continuar?",
+    "Edit": "Editar"
 }
