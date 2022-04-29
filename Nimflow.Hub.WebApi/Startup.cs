@@ -257,9 +257,9 @@ namespace Nimflow.Hub.WebApi
             const string documentName = "v1";
             services.AddOpenApiDocument(options =>
             {
-#if !DEBUG
-                options.OperationProcessors.Add(new AddUnitIdHeaderParameter());
-#endif
+//#if !DEBUG
+//                options.OperationProcessors.Add(new AddUnitIdHeaderParameter());
+//#endif
                 options.Version = typeof(InfoController).Assembly.GetName().Version?.ToString(3);
                 options.DocumentName = documentName;
                 options.Title = "Nimflow Hub";
