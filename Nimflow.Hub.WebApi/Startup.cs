@@ -26,6 +26,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Nimflow.BusinessDirectory;
 using Nimflow.Hub.AspNet;
 using Nimflow.Hub.AspNet.Auth;
@@ -33,6 +35,7 @@ using Nimflow.Hub.AspNet.Controllers;
 using Nimflow.Hub.WebApi.Services;
 using Nimflow.Hub.WebApi.Settings;
 using Nimflow.Images;
+using Nimflow.MongoDB;
 using Nimflow.Orch.Application.ApiManagement;
 using Nimflow.Users;
 using NJsonSchema;
@@ -169,10 +172,7 @@ namespace Nimflow.Hub.WebApi
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync(string.Empty);
-                });
+                endpoints.MapGet("/", async context => { await context.Response.WriteAsync(string.Empty); });
                 endpoints.MapControllers();
                 endpoints.MapHangfireDashboard();
                 endpoints.MapHealthChecks("/health");
@@ -180,6 +180,28 @@ namespace Nimflow.Hub.WebApi
             app.UseOpenApi();
             app.UseSwaggerUi3();
             Log.Logger.Information($"Starting with environment {env?.EnvironmentName}");
+            LogMongoDbConnectionStatus();
+        }
+
+        private void LogMongoDbConnectionStatus()
+        {
+            var settings = new MongoSettings();
+            Configuration.GetSection("MongoConnection").Bind(settings);
+            if (settings.ConnectionString == null)
+                Log.Logger.Error("Missing MongoConnection:ConnectionString");
+            else
+                Log.Logger.Warning($"MongoDB: {settings.ConnectionString[..Math.Min(settings.ConnectionString.Length - 1, 30)]}");
+            var provider = new MongoClientProvider(settings);
+            var db = provider.Client.GetDatabase(settings.DatabaseName);
+            try
+            {
+                var result = db.RunCommand((Command<BsonDocument>)"{ping:1}");
+                Log.Logger.Information($"MongoDB ping result: {result}");
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Error pinging MongoDB.");
+            }
         }
 
         private static void UseSpaFileServer(IApplicationBuilder app, IWebHostEnvironment env, string name, IEnumerable<string> defaultFileNames)
