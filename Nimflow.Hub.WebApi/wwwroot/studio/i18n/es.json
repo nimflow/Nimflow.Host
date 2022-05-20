@@ -212,6 +212,7 @@
     "Write": "Escribir",
     "Preview": "Previsualizar",
     "JsInitialPayloadBuilder": "Constructor de los datos iniciales de la respuesta",
+    "JsContextDataBuilder": "Constructor de los datos de contexto",
     "ContextSimulationNameAlreadyInUse": "Ya existe una simulación llamada {{name}}",
     "SwitchBusinessUnit": "Cambiar unidad",
     "Simulate": "Simular",

@@ -184,6 +184,7 @@
     "AddContextSimulation": "New simulation",
     "ImportContextSimulation": "Import simulation",
     "JsInitialPayloadBuilder": "Initial payload builder script",
+    "JsContextDataBuilder": "Context data builder script",
     "ContextSimulationNameAlreadyInUse": "There is already a simulation named {{name}}",
     "SwitchBusinessUnit": "Switch unit",
     "CommandText": "Command",
