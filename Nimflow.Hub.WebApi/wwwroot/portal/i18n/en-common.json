@@ -251,5 +251,8 @@
     "KeyboardOcrToolActiveStatus": "Extract and paste text from image (Esc to cancel)",
     "InviteUser": "Invite user",
     "ThereArePendingChanges": "There are changes pending",
-    "ChangesWillBeLost_Continue": "All changes will be lost. Continue?"
+    "ChangesWillBeLost_Continue": "All changes will be lost. Continue?",
+    "EditTaskData": "Edit task data",
+    "StartBeforeDate": "Start before date",
+    "EditingTaskData": "Editing task data"
 }

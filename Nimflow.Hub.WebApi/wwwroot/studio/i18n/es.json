@@ -775,7 +775,7 @@
     "FileIsNotAValidCollectionDefinition": "El archivo {{filename}} no contiene una definición de colección válida",
     "ConfirmDeleteCollectionDefinition": "Se borrará en forma permanente la definición de colección '{{name}}' y todos los datos asociados",
     "CollectionDefinitionHasValidationErrors": "La definición de colección tiene errores",
-    "CollectionDefinitionIsValid": "La definición de colección ha sido grabada",
+    "CollectionDefinitionIsValid": "La definición de colección es válida",
     "ItemSchema": "JsonSchema de los ítems",
     "ErrorSavingCollectionDefinition": "Error guardando definición de colección.",
     "CollectionDefinitionSaved": "Definición de colección guardada.",

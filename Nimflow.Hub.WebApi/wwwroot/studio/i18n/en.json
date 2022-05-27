@@ -691,7 +691,7 @@
     "FileIsNotAValidCollectionDefinition": "The file {{filename}} is not a valid collection definition",
     "ConfirmDeleteCollectionDefinition": "This will permanently delete collection definition '{{name}}' and all data associated",
     "CollectionDefinitionHasValidationErrors": "The collection definition has errors",
-    "CollectionDefinitionIsValid": "The collection definition was saved",
+    "CollectionDefinitionIsValid": "The collection definition is valid",
     "ItemSchema": "Items' JsonSchema",
     "ErrorSavingCollectionDefinition": "Error saving collection definition",
     "CollectionDefinitionSaved": "The collection definition was saved",

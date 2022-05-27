@@ -285,5 +285,8 @@
     "InviteUser": "Invitar usuario",
     "ThereArePendingChanges": "Existen cambios pendientes",
     "ChangesWillBeLost_Continue": "Todos los cambios se perderán. ¿Continuar?",
-    "Edit": "Editar"
+    "Edit": "Editar",
+    "EditTaskData": "Editar datos de la tarea",
+    "StartBeforeDate": "Inicio antes de",
+    "EditingTaskData": "Editando datos de la tarea"
 }
