@@ -722,5 +722,12 @@
     "ContextSimulations": "Simulations",
     "PreviewType": "Preview type",
     "MoveUp": "Move up",
-    "MoveDown": "Move down"
+    "MoveDown": "Move down",
+    "ContextDataLocationType": {
+        "top": "Top", 
+        "bottom": "Bottom", 
+        "left": "Left", 
+        "right": "Right"
+    },
+    "ContextDataLocation": "Context data location"
 }
