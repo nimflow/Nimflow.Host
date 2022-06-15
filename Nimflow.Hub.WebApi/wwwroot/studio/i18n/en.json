@@ -231,6 +231,7 @@
     "AssignedTo_value": "Assigned to: {{value}}",
     "AssignedToRole_value": "Assigned to role: {{value}}",
     "StartDate_value": "Start date: {{value}}",
+    "StartBeforeDate_value": "Start before date: {{value}}",
     "DueDate_value": "Due date: {{value}}",
     "Priority_value": "Priority: {{value}}",
     "SaveAs": "Save as...",
@@ -693,6 +694,7 @@
     "CollectionDefinitionHasValidationErrors": "The collection definition has errors",
     "CollectionDefinitionIsValid": "The collection definition is valid",
     "ItemSchema": "Items' JsonSchema",
+    "ItemUiSchema": "Items' UISchema",
     "ErrorSavingCollectionDefinition": "Error saving collection definition",
     "CollectionDefinitionSaved": "The collection definition was saved",
     "Unmodified": "Unmodified",
@@ -729,5 +731,8 @@
         "left": "Left", 
         "right": "Right"
     },
-    "ContextDataLocation": "Context data location"
+    "ContextDataLocation": "Context data location",
+    "VisibleColumns": "Visible columns",
+    "UiSchemaProviderFunctionName": "UISchema provider function",
+    "FreeVariable-CollectionDefinition": "The collection definition"
 }

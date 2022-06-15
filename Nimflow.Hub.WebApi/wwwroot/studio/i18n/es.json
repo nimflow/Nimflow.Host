@@ -264,6 +264,7 @@
     "AssignedTo_value": "Asignado a: {{value}}",
     "AssignedToRole_value": "Asignado a rol: {{value}}",
     "StartDate_value": "Inicio: {{value}}",
+    "StartBeforeDate_value": "Inicio antes de: {{value}}",
     "DueDate_value": "Vencimiento: {{value}}",
     "Priority_value": "Prioridad: {{value}}",
     "SaveAs": "Guardar como...",
@@ -777,6 +778,7 @@
     "CollectionDefinitionHasValidationErrors": "La definición de colección tiene errores",
     "CollectionDefinitionIsValid": "La definición de colección es válida",
     "ItemSchema": "JsonSchema de los ítems",
+    "ItemUiSchema": "UiSchema de los ítems",
     "ErrorSavingCollectionDefinition": "Error guardando definición de colección.",
     "CollectionDefinitionSaved": "Definición de colección guardada.",
     "Unmodified": "Sin cambios",
@@ -814,5 +816,8 @@
         "left": "A la izquierda", 
         "right": "A la derecha"
     },
-    "ContextDataLocation": "Ubicación de los datos de contexto"
+    "ContextDataLocation": "Ubicación de los datos de contexto",
+    "VisibleColumns": "Columnas visibles",
+    "UiSchemaProviderFunctionName": "Función proveedora de UISchema",
+    "FreeVariable-CollectionDefinition": "La definición de colección"
 }
