@@ -83,8 +83,11 @@ namespace Nimflow.Hub.WebApi.Services
             var credentialBytes = Convert.FromBase64String(credential);
             var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
             var token = await GetTokenFromHttpService(credentials[0], credentials[1], ct);
-            if (token == null)
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _logger.LogWarning($"null or empty token from authentication service for user: {credentials[0]}");
                 return null;
+            }
 
             jwtToken = new JwtSecurityToken(token);
             var absoluteExpiration = DateTimeOffset.Now.AddHours(1);
