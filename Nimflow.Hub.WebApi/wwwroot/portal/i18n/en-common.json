@@ -254,5 +254,6 @@
     "ChangesWillBeLost_Continue": "All changes will be lost. Continue?",
     "EditTaskData": "Edit task data",
     "StartBeforeDate": "Start before date",
-    "EditingTaskData": "Editing task data"
+    "EditingTaskData": "Editing task data",
+    "ValueRequired": "value required"
 }

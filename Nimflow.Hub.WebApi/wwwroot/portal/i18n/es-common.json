@@ -288,5 +288,6 @@
     "Edit": "Editar",
     "EditTaskData": "Editar datos de la tarea",
     "StartBeforeDate": "Inicio antes de",
-    "EditingTaskData": "Editando datos de la tarea"
+    "EditingTaskData": "Editando datos de la tarea",
+    "ValueRequired": "valor requerido"
 }

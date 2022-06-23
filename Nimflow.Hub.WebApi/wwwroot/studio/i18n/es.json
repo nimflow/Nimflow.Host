@@ -819,5 +819,6 @@
     "ContextDataLocation": "Ubicación de los datos de contexto",
     "VisibleColumns": "Columnas visibles",
     "UiSchemaProviderFunctionName": "Función proveedora de UISchema",
-    "FreeVariable-CollectionDefinition": "La definición de colección"
+    "FreeVariable-CollectionDefinition": "La definición de colección",
+    "ValueRequired": "valor requerido"
 }

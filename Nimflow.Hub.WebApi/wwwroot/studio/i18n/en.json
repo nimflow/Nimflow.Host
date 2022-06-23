@@ -734,5 +734,6 @@
     "ContextDataLocation": "Context data location",
     "VisibleColumns": "Visible columns",
     "UiSchemaProviderFunctionName": "UISchema provider function",
-    "FreeVariable-CollectionDefinition": "The collection definition"
+    "FreeVariable-CollectionDefinition": "The collection definition",
+    "ValueRequired": "value required"
 }
