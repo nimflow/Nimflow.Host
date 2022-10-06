@@ -499,6 +499,7 @@
     "SelectionDashboardParameterDataSource": "Fuente de datos",
     "SystemInfo": "Información del sistema",
     "AutoRefresh": "Auto refresco",
+    "RequiredPermissions": "Permisos requeridos",
     "Enabled": "Habilitado",
     "Disabled": "Deshabilitado",
     "DefaultInterval": "Frecuencia de refresco por defecto",
@@ -820,5 +821,16 @@
     "VisibleColumns": "Columnas visibles",
     "UiSchemaProviderFunctionName": "Función proveedora de UISchema",
     "FreeVariable-CollectionDefinition": "La definición de colección",
-    "ValueRequired": "valor requerido"
+    "ValueRequired": "valor requerido",
+    "SwitchToJson": "Cambiar a JSON",
+    "SwitchToFunction": "Cambiar a función",
+    "SelectingContextTypeType": "Seleccionando tipo de tipo de contexto",
+    "ContextTypeType_ComponentBased": "Basado en componentes",
+    "ContextTypeType_Legacy": "Legado",
+    "DuplicateComponentNames": "Nombres de componentes duplicados: {{names}}",
+    "SelectComponentType": "Seleccionar tipo de componente",
+    "ConfirmDeleteComponent": "Se borrará en forma permanente el component {{name}}",
+    "ComponentBased": "Basado en componentes",
+    "EditComponentAsJson": "Editar componente como JSON",
+    "ComponentId": "ID del componente"
 }

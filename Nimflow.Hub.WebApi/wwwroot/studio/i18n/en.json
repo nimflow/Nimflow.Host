@@ -427,6 +427,7 @@
     "SelectionDashboardParameterDataSource": "Data source",
     "SystemInfo": "System information",
     "AutoRefresh": "Auto refresh",
+    "RequiredPermissions": "Required permissions",
     "DefaultInterval": "Default refresh rate",
     "MinInterval": "Minimum time interval",
     "MinInterval_Details": "Prevents users from setting an auto refresh interval smaller than the provided value",
@@ -726,14 +727,25 @@
     "MoveUp": "Move up",
     "MoveDown": "Move down",
     "ContextDataLocationType": {
-        "top": "Top", 
-        "bottom": "Bottom", 
-        "left": "Left", 
+        "top": "Top",
+        "bottom": "Bottom",
+        "left": "Left",
         "right": "Right"
     },
     "ContextDataLocation": "Context data location",
     "VisibleColumns": "Visible columns",
     "UiSchemaProviderFunctionName": "UISchema provider function",
     "FreeVariable-CollectionDefinition": "The collection definition",
-    "ValueRequired": "value required"
+    "ValueRequired": "value required",
+    "SwitchToJson": "Switch to JSON",
+    "SwitchToFunction": "Switch to function",
+    "SelectingContextTypeType": "Selecting type of context type",
+    "ContextTypeType_ComponentBased": "ComponentBased",
+    "ContextTypeType_Legacy": "Legacy",
+    "DuplicateComponentNames": "Duplicated component names: {{names}}",
+    "SelectComponentType": "Select component type",
+    "ConfirmDeleteComponent": "This will permanently delete the component {{name}}",
+    "ComponentBased": "Component-based",
+    "EditComponentAsJson": "Edit component as JSON",
+    "ComponentId": "Component ID"
 }
