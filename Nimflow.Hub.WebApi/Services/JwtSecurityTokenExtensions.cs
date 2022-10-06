@@ -18,8 +18,18 @@ namespace Nimflow.Hub.WebApi.Services
                 return Array.Empty<string>();
             var roleNames = GetRoleNames(jwtToken, settings);
             return roleNames != null
-                ? roleNames.SelectMany(RoleActions.GetActionsByBuiltInRole).Distinct().ToArray()
+                ? roleNames.SelectMany(roleName => GetActionsByRole(roleName, settings)).Distinct().ToArray()
                 : Array.Empty<string>();
+        }
+
+        private static IEnumerable<string> GetActionsByRole(string roleName, BasicAuthenticationSettings basicAuthenticationSettings)
+        {
+            var result = RoleActions.GetActionsByBuiltInRole(roleName);
+            if (result is { Length: > 0 })
+                return result;
+            if (basicAuthenticationSettings.RoleActions == null || !basicAuthenticationSettings.RoleActions.TryGetValue(roleName, out var actions))
+                return Array.Empty<string>();
+            return actions ?? Array.Empty<string>();
         }
 
         public static IReadOnlyCollection<string> GetRoleNames(this JwtSecurityToken jwtToken, BasicAuthenticationSettings settings)

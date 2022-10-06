@@ -14,6 +14,7 @@ namespace Nimflow.Hub.WebApi.Settings
         public string NameType { get; set; }
 
         public ClaimRolesMapping[] ClaimRoleMappings { get; set; }
+        public IDictionary<string, string[]> RoleActions { get; set; } = new Dictionary<string, string[]>();
 
         public class ClaimRolesMapping
         {
