@@ -289,5 +289,9 @@
     "EditTaskData": "Editar datos de la tarea",
     "StartBeforeDate": "Inicio antes de",
     "EditingTaskData": "Editando datos de la tarea",
-    "ValueRequired": "valor requerido"
+    "ValueRequired": "Valor requerido",
+    "CouldNotInviteUser": "No se ha podido invitar al usuario",
+    "send_emails": "Enviar correos",
+    "read_collection-definitions": "Leer definiciones de colecciones",
+    "write_collection-definitions": "Escribir definiciones de colecciones"
 }

@@ -255,5 +255,9 @@
     "EditTaskData": "Edit task data",
     "StartBeforeDate": "Start before date",
     "EditingTaskData": "Editing task data",
-    "ValueRequired": "value required"
+    "ValueRequired": "value required",
+    "CouldNotInviteUser": "Could not invite user",
+    "send_emails": "Send e-mails",
+    "read_collection-definitions": "Read collection definitions",
+    "write_collection-definitions": "Write collection definitions"
 }
