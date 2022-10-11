@@ -67,7 +67,7 @@ namespace Nimflow.Hub.WebApi.Services
             if (settings.ClaimRoleMappings == null)
                 return jwtToken.Claims;
             var result = new List<Claim>(jwtToken.Claims);
-            var grantedActions = jwtToken.GetGrantedActions(settings);
+            var grantedActions = jwtToken.GetGrantedActions(settings, false);
             if (grantedActions.Count > 0)
                 result.Add(new Claim(AuthConstants.GrantActionsType, string.Join(';', grantedActions)));
             return result;

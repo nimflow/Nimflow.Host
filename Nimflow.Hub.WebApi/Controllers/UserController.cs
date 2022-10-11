@@ -60,7 +60,7 @@ namespace Nimflow.Hub.WebApi.Controllers
             {
                 Name = username,
                 Email = securityToken.Claims.FirstOrDefault(s => s.Type.ToLowerInvariant() == "email")?.Value,
-                GrantActions = securityToken.GetGrantedActions(_basicAuthenticationOptionsSnapshot.Value)?.ToArray() ?? Array.Empty<string>()
+                GrantActions = securityToken.GetGrantedActions(_basicAuthenticationOptionsSnapshot.Value, true)?.ToArray() ?? Array.Empty<string>()
             };
         }
 
