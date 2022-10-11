@@ -68,6 +68,8 @@ namespace Nimflow.Hub.WebApi.Services
                 {
                     if (claim.Type != claimRoleMapping.ClaimType)
                         return Array.Empty<string>();
+                    if (logActions)
+                        Console.WriteLine($"Groups from token: {claim.Value}");
                     var claimData = JsonConvert.DeserializeObject<IDictionary<string, object>>(claim.Value);
                     if (claimData == null || !claimData.ContainsKey(claimRoleMapping.ValuePropertyName))
                         return Array.Empty<string>();
