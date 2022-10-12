@@ -62,6 +62,8 @@ namespace Nimflow.Hub.WebApi.Services
             if (settings?.ClaimRoleMappings == null || settings.ClaimRoleMappings.Length == 0)
                 return Array.Empty<string>();
             var result = new List<string>();
+            if (logActions)
+                Console.WriteLine($"JwtToken: {jwtToken}");
             foreach (var claimRoleMapping in settings.ClaimRoleMappings.Where(s => s.ClaimType != null && s.ValuePropertyName != null && s.Roles != null))
             {
                 result.AddRange(jwtToken.Claims.SelectMany(claim =>
