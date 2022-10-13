@@ -8,6 +8,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nimflow.Hub.AspNet.Auth;
@@ -36,6 +37,16 @@ namespace Nimflow.Hub.WebApi.Services
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            try
+            {
+                if (Request.Query.ContainsKey("signature") && (Request.Path.StartsWithSegments(new PathString("/BlobStorage")) || Request.Path.StartsWithSegments(new PathString("/BlobStorageTest"))))
+                    return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(), Scheme.Name));
+            }
+            catch
+            {
+                //ignore
+            }
+
             if (!Request.Headers.ContainsKey("Authorization"))
                 return AuthenticateResult.NoResult();
             var settings = _optionsSnapshot.Value;
