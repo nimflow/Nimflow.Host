@@ -24,15 +24,15 @@ using ActionNames = Nimflow.BlobStorage.ActionNames;
 namespace Nimflow.Hub.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("BlobStorage", Order = -1)]
     [ExcludeFromCodeCoverage]
-    public class BlobStorageTestController : ControllerBase, IAllowAnonymous
+    public class BlobStorageAltController : ControllerBase, IAllowAnonymous
     {
         private readonly IUnitSession _unitSession;
         private readonly IMediator _mediator;
         private readonly IOptions<BlobStorageSettings> _blobStorageSettings;
 
-        public BlobStorageTestController(IUnitSession unitSession, IMediator mediator, IOptions<BlobStorageSettings> blobStorageSettings)
+        public BlobStorageAltController(IUnitSession unitSession, IMediator mediator, IOptions<BlobStorageSettings> blobStorageSettings)
         {
             _unitSession = unitSession;
             _mediator = mediator;
@@ -48,14 +48,16 @@ namespace Nimflow.Hub.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, typeof(object))]
         public async Task<IActionResult> Get(string path, CancellationToken ct)
         {
-            if (User.Identity?.IsAuthenticated != true)
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentNullException(nameof(path));
+            if (Request.Query.ContainsKey("signature"))
             {
-                Console.WriteLine("Testing blob storage on a unauthenticated user");
+                Console.WriteLine("Testing blob storage on signed url");
                 var requestFeature = HttpContext.Features.Get<IHttpRequestFeature>();
                 var rawUrl = $"{Request.Scheme}://{Request.Host}{requestFeature.RawTarget}";
                 if (!VerifyUri(rawUrl))
                 {
-                    Console.Error.WriteLine("Signature url is not OK");
+                    await Console.Error.WriteLineAsync("Signature url is not OK");
                     return Unauthorized();
                 }
 
