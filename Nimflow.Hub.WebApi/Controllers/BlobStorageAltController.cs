@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -13,11 +12,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Nimflow.BlobStorage;
+using Nimflow.ExecutionContext;
 using Nimflow.Hub.AspNet.Auth;
-using Nimflow.Hub.AspNet.BlobsStorage;
+using Nimflow.Images;
 using Nimflow.Orch.Application;
+using Nimflow.Orch.Application.Events;
+using Nimflow.Orch.Application.FireAndForget;
 using NSwag.Annotations;
 using ActionNames = Nimflow.BlobStorage.ActionNames;
 
@@ -28,17 +30,84 @@ namespace Nimflow.Hub.WebApi.Controllers
     [ExcludeFromCodeCoverage]
     public class BlobStorageAltController : ControllerBase, IAllowAnonymous
     {
-        private readonly IUnitSession _unitSession;
+        private readonly IFireAndForgetHandler _fireAndForgetHandler;
         private readonly IMediator _mediator;
-        private readonly IOptions<BlobStorageSettings> _blobStorageSettings;
+        private readonly IUnitSession _unitSession;
+        private readonly IExecutionContext _executionContext;
+        private readonly IBlobStorageUrlSigner _urlSigner;
 
-        public BlobStorageAltController(IUnitSession unitSession, IMediator mediator, IOptions<BlobStorageSettings> blobStorageSettings)
+        public BlobStorageAltController(IMediator mediator, IFireAndForgetHandler fireAndForgetHandler, IBlobStorageUrlSigner urlSigner, IUnitSession unitSession, IExecutionContext executionContext)
         {
-            _unitSession = unitSession;
             _mediator = mediator;
-            _blobStorageSettings = blobStorageSettings;
+            _fireAndForgetHandler = fireAndForgetHandler;
+            _urlSigner = urlSigner;
+            _unitSession = unitSession;
+            _executionContext = executionContext;
         }
 
+        /// <summary>
+        ///     Upload file
+        /// </summary>
+        /// <description>
+        ///     Uploads files to a folder specified by a path.
+        /// </description>
+        /// <param name="path"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        [DisableRequestSizeLimit]
+        public async Task<WriteFilesResult> Upload(string path, CancellationToken ct)
+        {
+            var fileNames = new List<string>();
+            var formCollection = await Request.ReadFormAsync(ct);
+            ct.ThrowIfCancellationRequested();
+            foreach (var file in formCollection.Files)
+            {
+                await using var stream = new MemoryStream();
+                await file.CopyToAsync(stream, ct);
+                stream.Position = 0;
+                var command = new WriteBlob
+                {
+                    Data = stream,
+                    Path = UrlUtils.Combine(path, file.FileName)
+                };
+                await _mediator.Send(command, ct);
+                fileNames.Add(file.FileName);
+            }
+
+            var result = new WriteFilesResult
+            {
+                Path = path,
+                FileNames = fileNames.ToArray()
+            };
+            await _fireAndForgetHandler.Execute(serviceProvider => serviceProvider.GetRequiredService<IEventPublisher>().SendBlobStorageFilesUpdated(result, CancellationToken.None));
+            return result;
+        }
+
+        /// <summary>
+        ///     List files
+        /// </summary>
+        /// <description>
+        ///     Lists the blob contents at a specified path.
+        /// </description>
+        /// <param name="command"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public Task<IReadOnlyCollection<Blob>> List(List command, CancellationToken ct)
+        {
+            return _mediator.Send(command, ct);
+        }
+
+        /// <summary>
+        ///     Get file from path
+        /// </summary>
+        /// <description>
+        ///     Streams the binary file content from a path.
+        /// </description>
+        /// <param name="path"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [HttpGet("{*path}")]
         [AllowAnonymous]
         [SwaggerResponse(typeof(string))]
@@ -48,19 +117,13 @@ namespace Nimflow.Hub.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, typeof(object))]
         public async Task<IActionResult> Get(string path, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentNullException(nameof(path));
             if (Request.Query.ContainsKey("signature"))
             {
-                Console.WriteLine("Testing blob storage on signed url");
-                var requestFeature = HttpContext.Features.Get<IHttpRequestFeature>();
-                var rawUrl = $"{Request.Scheme}://{Request.Host}{requestFeature.RawTarget}";
-                if (!VerifyUri(rawUrl))
-                {
-                    await Console.Error.WriteLineAsync("Signature url is not OK");
-                    return Unauthorized();
-                }
-
+                Console.WriteLine("Entering to get a blobstorage file with signature");
+                //var requestFeature = HttpContext.Features.Get<IHttpRequestFeature>();
+                //var rawUrl = $"{Request.Scheme}://{Request.Host}{requestFeature.RawTarget}";
+                //if (!_urlSigner.VerifyUri(rawUrl))
+                //    return Unauthorized();
                 if (QueryHelpers.ParseQuery(Request.QueryString.Value ?? "").TryGetValue("unitId", out var unitId) && unitId.Count > 0)
                     _unitSession.SetUnitId(unitId[0]);
                 // Grant read storage permission
@@ -70,9 +133,9 @@ namespace Nimflow.Hub.WebApi.Controllers
                     new(AuthConstants.GrantActionsType, ActionNames.ReadStorage)
                 };
                 HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "signedUrl"));
-                Console.WriteLine("Signature url is OK");
+                Console.WriteLine("User assigned");
+                _executionContext.AutomationRunning = true;
             }
-
             var command = new OpenRead { Path = path };
             var stream = await _mediator.Send(command, ct);
             if (stream == null)
@@ -84,60 +147,111 @@ namespace Nimflow.Hub.WebApi.Controllers
                 : new FileStreamResult(stream, "application/unknown");
         }
 
-        private static string GetSignatureForUri(string uri, byte[] key)
+        /// <summary>
+        ///     Get file thumbnails
+        /// </summary>
+        /// <description>
+        ///     Creates a thumbnails data-url array from an image in the blob storage
+        /// </description>
+        /// <param name="query"></param>
+        /// <param name="ct"></param>
+        /// <returns>An array containing a dataurl string for each page</returns>
+        [HttpPost("[action]")]
+        public Task<IEnumerable<string>> GetThumbnails(GetThumbnails query, CancellationToken ct)
         {
-            var hmac = new HMACSHA256(key);
-            var signature = hmac.ComputeHash(Encoding.UTF8.GetBytes(uri));
-            var hexSignature = BitConverter.ToString(signature).Replace("-", string.Empty).ToLowerInvariant();
-            return hexSignature;
+            return _mediator.Send(query, ct);
         }
 
-        private byte[] GetKey()
+        /// <summary>
+        ///     Get file's data url from path
+        /// </summary>
+        /// <description>
+        ///     Reads a blob file content from a path a return the content as a DataUrl string.
+        ///     https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+        /// </description>
+        /// <param name="path"></param>
+        /// <param name="ct"></param>
+        /// <returns>Returns the base64 encoded string</returns>
+        [HttpGet("[action]/{*path}")]
+        [DisableRequestSizeLimit]
+        public Task<string> GetDataUrl(string path, CancellationToken ct)
         {
-            Console.WriteLine($"UrlSignatureKey: {_blobStorageSettings.Value.UrlSignatureKey}");
-            var keyBase64 = _blobStorageSettings.Value.UrlSignatureKey;
-            if (string.IsNullOrEmpty(keyBase64))
-                return null;
-            var key = Convert.FromBase64String(keyBase64);
-            return key;
+            return _mediator.Send(new GetDataUrl { Path = path }, ct);
         }
 
-        private bool UrlSigningSupported() => !string.IsNullOrEmpty(_blobStorageSettings.Value.UrlSignatureKey);
-
-        private string SignUri(string uri)
+        /// <summary>
+        ///     Delete file
+        /// </summary>
+        /// <description>
+        ///     Deletes a blob from a full path.
+        /// </description>
+        /// <param name="command"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public Task<DeleteFileResponse> Delete(DeleteFile command, CancellationToken ct)
         {
-            var key = GetKey();
-            if (key == null)
-                return null;
-            var hexSignature = GetSignatureForUri(uri, key);
-            return QueryHelpers.AddQueryString(uri, new Dictionary<string, string> { { "signature", hexSignature } });
+            return _mediator.Send(command, ct);
         }
 
-        private bool VerifyUri(string uri)
+        /// <summary>
+        ///     Returns a boolean value indicating if the blob storage feature is configured and available in the HUB.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public Task<bool> IsSupported()
         {
-            var key = GetKey();
-            if (key == null)
-                return false;
-            var signatureRegex = "[\\?&]signature=([a-z0-9]+)$";
-            var signatureMatch = Regex.Match(uri, signatureRegex);
-            if (!signatureMatch.Success)
-            {
-                Console.Error.WriteLine("signatureMatch failed.");
-                return false;
-            }
-            if (signatureMatch.Groups.Count != 2)
-            {
-                Console.Error.WriteLine($"signatureMatch group count: {signatureMatch.Groups.Count}");
-                return false;
-            }
-            var parsedSignature = signatureMatch.Groups[1].Value;
-            var originalUri = Regex.Replace(uri, signatureRegex, "");
-            var hexSignature = GetSignatureForUri(originalUri, key);
-            if (hexSignature != parsedSignature)
-            {
-                Console.Error.WriteLine($"hexSignature: {hexSignature} !== parsedSignature: {parsedSignature}");
-            }
-            return hexSignature == parsedSignature;
+            return _mediator.Send(new BlobStorageSupported());
+        }
+
+        /// <summary>
+        ///     Write files from base 64 data
+        /// </summary>
+        /// <description>
+        ///     Writes multiple file blobs to a single folder.
+        /// </description>
+        /// <param name="command">
+        ///     Command containing the target folder and each file content encoded as a base64 string with a
+        ///     filename.
+        /// </param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        [DisableRequestSizeLimit]
+        public Task<WriteFilesResult> WriteFiles(WriteFiles command, CancellationToken ct)
+        {
+            return _mediator.Send(command, ct);
+        }
+
+        /// <summary>
+        ///     Get a signed url for the blob
+        /// </summary>
+        /// <description>
+        ///     Get a cryptographically signed url to access the blob without requiring token authentication
+        /// </description>
+        /// <param name="path"></param>
+        /// <param name="ct"></param>
+        /// <returns>Returns the signed url</returns>
+        [HttpGet("[action]")]
+        [SwaggerResponse(typeof(string))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(object))]
+        public async Task<ActionResult<string>> GetSignedUrl(string path, CancellationToken ct)
+        {
+            var idx = path.LastIndexOf("/", StringComparison.CurrentCultureIgnoreCase);
+            var basePath = idx >= 0 ? path[..idx] : null;
+            var prefix = idx >= 0 ? path[(idx + 1)..] : path;
+            var list = await _mediator.Send(new List { Path = basePath, FilePrefix = prefix }, ct);
+            if (!list.Any())
+                return NotFound();
+            var url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/BlobStorage";
+            if (!url.EndsWith("/"))
+                url += "/";
+            url += path;
+            if (!_urlSigner.UrlSigningSupported())
+                return url;
+            url += $"?unitId={_unitSession.GetUnitId()}";
+            var signedUrl = _urlSigner.SignUri(url);
+            return signedUrl ?? url;
         }
     }
 }
