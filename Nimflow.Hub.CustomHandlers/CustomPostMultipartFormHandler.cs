@@ -92,11 +92,13 @@ namespace Nimflow.Hub.CustomHandlers
 
         protected HttpContent BuildContent(CustomPostMultipartForm request, HttpRequestMessage httpRequestMessage)
         {
+            var chars = 0;
             var form = new MultipartFormDataContent();
             if (request.StringEntries != null)
             {
                 foreach (var stringEntry in request.StringEntries)
                 {
+                    chars += stringEntry.Value?.Length ?? 0;
                     form.Add(new StringContent(stringEntry.Value), stringEntry.Name);
                 }
             }
@@ -113,13 +115,14 @@ namespace Nimflow.Hub.CustomHandlers
                 files++;
                 var match = Regex.Match(base64FileEntry.Base64, @"data:image/(?<type>.+?),(?<data>.+)");
                 var base64Data = match.Groups.Count == 3 ? match.Groups["data"].Value : base64FileEntry.Base64;
+                chars += base64Data?.Length ?? 0;
                 var content = new ByteArrayContent(Convert.FromBase64String(base64Data));
                 var name = !string.IsNullOrWhiteSpace(base64FileEntry.Name) ? base64FileEntry.Name : $"file{files}";
                 content.Headers.Add("Content-Disposition", string.Format($"form-data; name=\"{name}\"; filename=\"{base64FileEntry.FileName}\""));
                 form.Add(content, name);
             }
 
-            _logger.LogInformation($"{nameof(CustomPostMultipartFormHandler)} content with {request.Base64FileEntries.Length} Base64FileEntries built.");
+            _logger.LogInformation($"{nameof(CustomPostMultipartFormHandler)} content with {request.Base64FileEntries.Length} Base64FileEntries built. Total chars: {chars}.");
             return form;
         }
 
