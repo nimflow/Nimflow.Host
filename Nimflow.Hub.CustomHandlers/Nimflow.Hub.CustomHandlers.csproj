@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nimflow.Functions.Http" Version="4.69.0" />
+    <PackageReference Include="Nimflow.Functions.Http" Version="4.69.1" />
   </ItemGroup>
 
 </Project>
