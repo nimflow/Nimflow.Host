@@ -32,6 +32,7 @@ using Nimflow.BusinessDirectory;
 using Nimflow.Hub.AspNet;
 using Nimflow.Hub.AspNet.Auth;
 using Nimflow.Hub.AspNet.Controllers;
+using Nimflow.Hub.CustomHandlers;
 using Nimflow.Hub.WebApi.Services;
 using Nimflow.Hub.WebApi.Settings;
 using Nimflow.Images;
@@ -71,8 +72,12 @@ namespace Nimflow.Hub.WebApi
                 .ToArray();
             services.AddNimflowHub(
                 Configuration,
-                _ => { },
-                new[] { typeof(MergeStorageImagePages).Assembly },
+                functionOptions => { functionOptions.RegisterModule(new CustomHttpModule()); },
+                new[]
+                {
+                    typeof(MergeStorageImagePages).Assembly,
+                    typeof(CustomPostMultipartFormHandler).Assembly
+                },
                 authenticationSchemas);
             var customBusinessDirectorySection = Configuration.GetSection("CustomBusinessDirectory");
             if (customBusinessDirectorySection.Exists())

@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31613.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimflow.Hub.WebApi", "Nimflow.Hub.WebApi\Nimflow.Hub.WebApi.csproj", "{FE617515-5953-409F-B9FC-4C3B9A8FC026}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimflow.Hub.WebApi.Tests", "Nimflow.Hub.WebApi.Tests\Nimflow.Hub.WebApi.Tests.csproj", "{14FDC466-18F1-48BD-A863-24CC7D6A140C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimflow.Hub.CustomHandlers", "Nimflow.Hub.CustomHandlers\Nimflow.Hub.CustomHandlers.csproj", "{E2075E31-B34C-4E59-A498-1D1CBDC80841}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{14FDC466-18F1-48BD-A863-24CC7D6A140C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14FDC466-18F1-48BD-A863-24CC7D6A140C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14FDC466-18F1-48BD-A863-24CC7D6A140C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2075E31-B34C-4E59-A498-1D1CBDC80841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2075E31-B34C-4E59-A498-1D1CBDC80841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2075E31-B34C-4E59-A498-1D1CBDC80841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2075E31-B34C-4E59-A498-1D1CBDC80841}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
