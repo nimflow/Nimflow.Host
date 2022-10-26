@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Nimflow.BlobStorage;
 using Nimflow.Functions.Http;
 
 namespace Nimflow.Hub.CustomHandlers
@@ -29,7 +30,7 @@ namespace Nimflow.Hub.CustomHandlers
         {
             _logger.LogInformation($"{nameof(CustomPostMultipartFormHandler)} started.");
             using var client = _httpClientFactory.CreateClient(GetType().Name);
-            var httpRequest = new HttpRequestMessage(GetHttpMethod(request), request.Uri)
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, request.Uri)
             {
                 RequestUri = new Uri(request.Uri)
             };
@@ -116,7 +117,7 @@ namespace Nimflow.Hub.CustomHandlers
                 var match = Regex.Match(base64FileEntry.Base64, @"data:image/(?<type>.+?),(?<data>.+)");
                 var base64Data = match.Groups.Count == 3 ? match.Groups["data"].Value : base64FileEntry.Base64;
                 chars += base64Data?.Length ?? 0;
-                var content = new ByteArrayContent(Convert.FromBase64String(base64Data));
+                var content = new ByteArrayContent(Convert.FromBase64String(base64Data ?? string.Empty));
                 var name = !string.IsNullOrWhiteSpace(base64FileEntry.Name) ? base64FileEntry.Name : $"file{files}";
                 content.Headers.Add("Content-Disposition", string.Format($"form-data; name=\"{name}\"; filename=\"{base64FileEntry.FileName}\""));
                 form.Add(content, name);
@@ -124,11 +125,6 @@ namespace Nimflow.Hub.CustomHandlers
 
             _logger.LogInformation($"{nameof(CustomPostMultipartFormHandler)} content with {request.Base64FileEntries.Length} Base64FileEntries built. Total chars: {chars}.");
             return form;
-        }
-
-        protected HttpMethod GetHttpMethod(CustomPostMultipartForm request)
-        {
-            return HttpMethod.Post;
         }
     }
 }
